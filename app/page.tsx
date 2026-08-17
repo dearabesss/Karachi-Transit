@@ -145,7 +145,7 @@ export default function NationalTransitApp() {
                 <div>
                   <label className="text-xs font-bold text-slate-700 uppercase mb-1.5 block">{isUrdu ? "روانگی" : "Origin"}</label>
                   <select
-                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900 bg-white"
                     value={selectedOrigin?.name || ""}
                     onChange={(e) => setSelectedOrigin(allStops.find(s => s.name === e.target.value) || null)}
                   >
@@ -157,7 +157,7 @@ export default function NationalTransitApp() {
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase">{isUrdu ? "منزل" : "Destination"}</label>
                   <select
-                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900 bg-white"
                     value={selectedDestination?.name || ""}
                     onChange={(e) => setSelectedDestination(allStops.find(s => s.name === e.target.value) || null)}
                   >
@@ -236,7 +236,7 @@ export default function NationalTransitApp() {
                 </div>
               ) : (
                 reports.map((rep) => (
-                  <div key={rep.id} className="bg-white border border-slate-200 p-3.5 rounded space-y-2">
+                  <div key={rep.id} className="bg-white border border-slate-200 p-3.5 rounded space-y-2 shadow-sm">
                     <div className="flex justify-between"><span className="text-xs font-bold">{rep.routeName}</span><span className="text-[10px] text-slate-500">{rep.timestamp}</span></div>
                     <div className="flex gap-1.5"><span className="bg-slate-100 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">{rep.issueType}</span><span className="text-xs text-slate-600">@ {rep.stopName}</span></div>
                     <p className="text-xs text-slate-700">{rep.comment}</p>

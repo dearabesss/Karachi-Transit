@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { TRANSIT_ROUTES, DelayReport } from "@/data/transitData";
+import React, { useState, useEffect } from "react";
+import { TransitRoute, DelayReport } from "@/data/transitData";
 import { AlertTriangle, X } from "lucide-react";
 
 interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (report: DelayReport) => void;
+  activeRoutes: TransitRoute[];
   initialStopName?: string;
-  initialRouteId?: string;
   isUrdu?: boolean;
 }
 
@@ -17,26 +17,38 @@ export default function ReportModal({
   isOpen,
   onClose,
   onSuccess,
+  activeRoutes,
   initialStopName = "",
-  initialRouteId = TRANSIT_ROUTES[0].id,
   isUrdu = false,
 }: ReportModalProps) {
-  const [routeId, setRouteId] = useState(initialRouteId);
+  const [routeId, setRouteId] = useState("");
   const [stopName, setStopName] = useState(initialStopName);
   const [issueType, setIssueType] = useState<DelayReport["issueType"]>("Delay");
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Set default route when modal opens based on the active city
+  useEffect(() => {
+    if (isOpen && activeRoutes.length > 0 && !routeId) {
+      setRouteId(activeRoutes[0].id);
+    }
+  }, [isOpen, activeRoutes, routeId]);
+
+  // Update stop name if passed dynamically
+  useEffect(() => {
+    if (initialStopName) setStopName(initialStopName);
+  }, [initialStopName]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const targetRoute = TRANSIT_ROUTES.find((r) => r.id === routeId);
+    const targetRoute = activeRoutes.find((r) => r.id === routeId);
 
     const payload = {
       routeId,
-      routeName: targetRoute ? targetRoute.name : "Karachi Bus",
+      routeName: targetRoute ? targetRoute.name : "Transit Bus",
       stopName: stopName.trim() || (targetRoute ? targetRoute.stops[0].name : "Station"),
       issueType,
       comment: comment.trim(),
@@ -53,6 +65,7 @@ export default function ReportModal({
         onSuccess(data.report);
       }
     } catch {
+      // Fallback if API fails
       onSuccess({
         id: `rep-${Date.now()}`,
         routeId: payload.routeId,
@@ -91,7 +104,7 @@ export default function ReportModal({
               onChange={(e) => setRouteId(e.target.value)}
               className="w-full border-2 border-slate-300 rounded-lg px-4 py-3 text-base text-slate-900 focus:outline-none focus:border-slate-900"
             >
-              {TRANSIT_ROUTES.map((r) => (
+              {activeRoutes.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.service} — {r.name}
                 </option>

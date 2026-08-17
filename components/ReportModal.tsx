@@ -27,14 +27,12 @@ export default function ReportModal({
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Set default route when modal opens based on the active city
   useEffect(() => {
     if (isOpen && activeRoutes.length > 0 && !routeId) {
       setRouteId(activeRoutes[0].id);
     }
   }, [isOpen, activeRoutes, routeId]);
 
-  // Update stop name if passed dynamically
   useEffect(() => {
     if (initialStopName) setStopName(initialStopName);
   }, [initialStopName]);
@@ -65,7 +63,6 @@ export default function ReportModal({
         onSuccess(data.report);
       }
     } catch {
-      // Fallback if API fails
       onSuccess({
         id: `rep-${Date.now()}`,
         routeId: payload.routeId,

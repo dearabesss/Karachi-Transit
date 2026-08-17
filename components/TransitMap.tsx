@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import dynamic from "next/dynamic";
+import TransitMap from "@/components/TransitMap";
 import {
   CITIES,
   CityId,
@@ -14,15 +14,6 @@ import {
 } from "@/data/transitData";
 import ReportModal from "@/components/ReportModal";
 import { Navigation, AlertTriangle, Clock, Languages, Map as MapIcon, MapPin } from "lucide-react";
-
-const TransitMap = dynamic(() => import("@/components/TransitMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-600 text-sm font-medium">
-      Loading Interactive Map...
-    </div>
-  ),
-});
 
 export default function NationalTransitApp() {
   const [isUrdu, setIsUrdu] = useState(false);

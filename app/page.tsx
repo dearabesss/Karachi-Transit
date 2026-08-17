@@ -99,53 +99,71 @@ export default function NationalTransitApp() {
   }, [selectedOrigin, selectedDestination, activeRoutes]);
 
   return (
-    <div className="flex flex-col h-screen bg-white md:flex-row font-sans text-slate-900 overflow-hidden">
-      <aside className="w-full md:w-[420px] bg-white border-r border-slate-300 flex flex-col z-20 shrink-0 h-[55%] md:h-full">
+    <div className="flex flex-col h-[100dvh] bg-white md:flex-row font-sans text-slate-900 overflow-hidden">
+      
+      {/* MAP VIEW - On Mobile it is on TOP, on Desktop it is on the RIGHT */}
+      <main className="flex-1 bg-slate-200 relative z-0 h-[35dvh] md:h-full w-full order-1 md:order-2 border-b md:border-b-0 md:border-l border-slate-300">
+        <TransitMap
+          routes={activeRoutes}
+          activeLegs={journeyData ? journeyData.legs : null}
+          hoveredLegIndex={hoveredLegIndex}
+          userCoords={userCoords}
+          cityCenter={activeCityConfig.center}
+          onSelectAsOrigin={(s) => setSelectedOrigin(s)}
+          onSelectAsDestination={(s) => setSelectedDestination(s)}
+        />
+      </main>
+
+      {/* CONTROLS PANEL - On Mobile it is on BOTTOM, on Desktop it is on the LEFT */}
+      <aside className="w-full md:w-[420px] bg-white flex flex-col z-20 shrink-0 h-[65dvh] md:h-full order-2 md:order-1 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] md:shadow-none rounded-t-2xl md:rounded-none -mt-4 md:mt-0 relative overflow-hidden">
         
-        <header className="px-5 py-3 bg-slate-900 text-white flex items-center justify-between shrink-0">
-          <h1 className="text-base font-bold tracking-tight">{isUrdu ? "پاک ٹرانزٹ" : "Pak Transit"}</h1>
-          <button onClick={() => setIsUrdu(!isUrdu)} className="flex items-center gap-1.5 text-xs bg-slate-800 border border-slate-600 px-2 py-1 rounded">
-            <Languages className="w-3.5 h-3.5 text-emerald-400" /> {isUrdu ? "English" : "اردو"}
+        {/* Mobile Drag Handle Visualizer */}
+        <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mt-2.5 mb-1.5 md:hidden"></div>
+
+        <header className="px-5 pb-3 pt-2 md:pt-4 bg-white text-slate-900 flex items-center justify-between shrink-0 border-b border-slate-200">
+          <h1 className="text-lg font-black tracking-tight">{isUrdu ? "پاک ٹرانزٹ" : "Pak Transit"}</h1>
+          <button onClick={() => setIsUrdu(!isUrdu)} className="flex items-center gap-1.5 text-xs bg-slate-100 border border-slate-300 text-slate-800 px-2.5 py-1.5 rounded font-bold hover:bg-slate-200">
+            <Languages className="w-4 h-4 text-emerald-600" /> {isUrdu ? "English" : "اردو"}
           </button>
         </header>
 
-        <div className="bg-slate-800 px-5 py-2.5 border-t border-slate-700 shrink-0 flex items-center gap-3">
-           <MapIcon className="w-4 h-4 text-slate-400" />
+        <div className="bg-slate-900 px-5 py-3 border-t border-slate-700 shrink-0 flex items-center gap-3">
+           <MapIcon className="w-5 h-5 text-slate-400" />
            <select 
               value={selectedCityId}
               onChange={(e) => handleCityChange(e.target.value as CityId)}
-              className="bg-slate-800 text-white text-sm font-bold focus:outline-none w-full cursor-pointer"
+              className="bg-slate-900 text-white text-base md:text-sm font-bold focus:outline-none w-full cursor-pointer appearance-none"
            >
-              {CITIES.map(city => <option key={city.id} value={city.id}>{isUrdu ? city.urduName : city.name} Network</option>)}
+              {CITIES.map(city => <option key={city.id} value={city.id}>{isUrdu ? city.urduName : city.name} Transit Network</option>)}
            </select>
         </div>
 
         <div className="flex border-b border-slate-200 px-5 pt-3 bg-slate-50 shrink-0">
-          <button onClick={() => setActiveTab("plan")} className={`pb-2 mr-5 text-xs font-bold uppercase tracking-wider border-b-[3px] ${activeTab === "plan" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500"}`}>
-            {isUrdu ? "روٹ پلانر" : "Route Planner"}
+          <button onClick={() => setActiveTab("plan")} className={`pb-2 mr-5 text-sm font-bold uppercase tracking-wider border-b-[3px] ${activeTab === "plan" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500"}`}>
+            {isUrdu ? "روٹ پلانر" : "Plan Trip"}
           </button>
-          <button onClick={() => setActiveTab("reports")} className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-[3px] flex items-center gap-1.5 ${activeTab === "reports" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500"}`}>
-            {isUrdu ? "لائیو الرٹس" : "Live Alerts"}
+          <button onClick={() => setActiveTab("reports")} className={`pb-2 text-sm font-bold uppercase tracking-wider border-b-[3px] flex items-center gap-1.5 ${activeTab === "reports" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500"}`}>
+            {isUrdu ? "لائیو الرٹس" : "Alerts"}
             <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">{reports.length}</span>
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        <div className="flex-1 overflow-y-auto p-5 space-y-6 pb-12">
           {activeTab === "plan" ? (
             <>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <button 
                   onClick={handleGetLocationAndSetOrigin}
-                  className="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors"
+                  className="w-full bg-slate-100 text-slate-800 border border-slate-300 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors shadow-sm"
                 >
-                  <Navigation className="w-4 h-4" />
-                  {isUrdu ? "قریبی اسٹاپ پر سنیپ کریں" : "Snap to Nearest Stop"}
+                  <Navigation className="w-4 h-4 text-blue-600" />
+                  {isUrdu ? "قریبی اسٹاپ تلاش کریں" : "Find Nearest Stop via GPS"}
                 </button>
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 uppercase mb-1.5 block">{isUrdu ? "روانگی" : "Origin"}</label>
                   <select
-                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900 bg-white"
+                    className="w-full border-2 border-slate-300 rounded-lg px-3 py-3 text-base md:text-sm font-medium focus:border-slate-900 bg-white"
                     value={selectedOrigin?.name || ""}
                     onChange={(e) => setSelectedOrigin(allStops.find(s => s.name === e.target.value) || null)}
                   >
@@ -157,7 +175,7 @@ export default function NationalTransitApp() {
                 <div>
                   <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase">{isUrdu ? "منزل" : "Destination"}</label>
                   <select
-                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900 bg-white"
+                    className="w-full border-2 border-slate-300 rounded-lg px-3 py-3 text-base md:text-sm font-medium focus:border-slate-900 bg-white"
                     value={selectedDestination?.name || ""}
                     onChange={(e) => setSelectedDestination(allStops.find(s => s.name === e.target.value) || null)}
                   >
@@ -168,78 +186,74 @@ export default function NationalTransitApp() {
               </div>
 
               {journeyData ? (
-                <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="space-y-5">
                   <div className="flex gap-3">
-                    <div className="flex-1 bg-slate-50 border border-slate-200 p-3 rounded">
+                    <div className="flex-1 bg-slate-50 border border-slate-200 p-3 rounded-xl shadow-sm">
                       <p className="text-[11px] font-bold text-slate-500 uppercase">{isUrdu ? "کل کرایہ" : "Total Fare"}</p>
-                      <p className="text-xl font-black text-slate-900 mt-0.5">Rs. {journeyData.totalFare}</p>
+                      <p className="text-2xl font-black text-slate-900 mt-0.5">Rs. {journeyData.totalFare}</p>
                     </div>
-                    <div className="flex-1 bg-slate-50 border border-slate-200 p-3 rounded">
+                    <div className="flex-1 bg-slate-50 border border-slate-200 p-3 rounded-xl shadow-sm">
                       <p className="text-[11px] font-bold text-slate-500 uppercase">{isUrdu ? "وقت" : "Est. Time"}</p>
-                      <p className="text-xl font-black text-slate-900 mt-0.5 flex items-end gap-1">
-                        {journeyData.totalTime} <span className="text-xs font-bold text-slate-500 mb-0.5">min</span>
+                      <p className="text-2xl font-black text-slate-900 mt-0.5 flex items-end gap-1">
+                        {journeyData.totalTime} <span className="text-sm font-bold text-slate-500 mb-0.5">min</span>
                       </p>
                     </div>
                   </div>
 
-                  <div className="space-y-4 border-l-[3px] border-slate-200 pl-4 ml-1">
+                  <div className="space-y-4 border-l-[3px] border-slate-200 pl-5 ml-2 mt-6">
                     {journeyData.legs.map((leg, index) => (
                       <div 
                         key={index} 
-                        className="relative p-2 rounded hover:bg-slate-50 cursor-pointer transition-colors"
+                        className="relative pb-2"
                         onMouseEnter={() => setHoveredLegIndex(index)}
                         onMouseLeave={() => setHoveredLegIndex(null)}
                       >
                         <div 
-                          className="absolute -left-[27px] top-3 w-3 h-3 rounded-full border-2 border-white"
+                          className="absolute -left-[29px] top-1 w-4 h-4 rounded-full border-[3px] border-white"
                           style={{ backgroundColor: leg.type === "WALK" ? "#94a3b8" : leg.route?.colorHex }}
                         ></div>
                         
-                        <h4 className="text-sm font-bold text-slate-900 leading-tight">
+                        <h4 className="text-base font-bold text-slate-900 leading-tight">
                           {leg.type === "WALK" ? (isUrdu ? "پیدل / ٹرانسفر" : "Walk / Transfer") : leg.route?.name}
                         </h4>
                         
-                        <div className="mt-1.5 space-y-0.5">
-                           <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "From:" : "Board:"}</span> {leg.startStop.name}</p>
-                           <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "To:" : "Drop:"}</span> {leg.endStop.name}</p>
+                        <div className="mt-2 space-y-1">
+                           <p className="text-sm text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "From:" : "Board:"}</span> {leg.startStop.name}</p>
+                           <p className="text-sm text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "To:" : "Drop:"}</span> {leg.endStop.name}</p>
                         </div>
 
-                        <div className="mt-1.5 text-[11px] font-semibold text-slate-500 flex gap-2.5">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3"/>{leg.timeMins} min</span>
+                        <div className="mt-2 text-xs font-semibold text-slate-500 flex gap-3">
+                          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5"/>{leg.timeMins} min</span>
                           <span>{leg.distanceKm} km</span>
-                          {leg.fare && <span className="text-slate-800">Rs. {leg.fare}</span>}
+                          {leg.fare && <span className="text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Rs. {leg.fare}</span>}
                         </div>
                       </div>
                     ))}
                   </div>
-
-                  <button onClick={() => setIsReportModalOpen(true)} className="w-full bg-red-50 text-red-700 border border-red-200 text-xs font-bold py-2.5 rounded hover:bg-red-100 flex items-center justify-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5" /> {isUrdu ? "مسئلہ رپورٹ کریں" : "Report Issue on Route"}
-                  </button>
                 </div>
               ) : (
-                <div className="bg-slate-50 border border-dashed border-slate-300 p-8 rounded text-center">
-                  <MapPin className="w-6 h-6 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm font-bold text-slate-600">Select Locations</p>
-                  <p className="text-xs text-slate-500 mt-1">Select an origin and destination to generate a route.</p>
+                <div className="bg-slate-50 border-2 border-dashed border-slate-300 p-8 rounded-xl text-center">
+                  <MapPin className="w-8 h-8 text-slate-400 mx-auto mb-3" />
+                  <p className="text-base font-bold text-slate-600">Select Locations</p>
+                  <p className="text-sm text-slate-500 mt-1">Select an origin and destination to generate a route.</p>
                 </div>
               )}
             </>
           ) : (
-            <div className="space-y-3">
-              <button onClick={() => setIsReportModalOpen(true)} className="w-full bg-slate-900 text-white text-sm font-bold py-2.5 rounded hover:bg-slate-800">
+            <div className="space-y-4">
+              <button onClick={() => setIsReportModalOpen(true)} className="w-full bg-slate-900 text-white text-base font-bold py-3.5 rounded-lg hover:bg-slate-800 shadow-md">
                 + {isUrdu ? "نئی رپورٹ شامل کریں" : "Post Update"}
               </button>
               {reports.length === 0 ? (
-                <div className="bg-slate-50 border border-dashed border-slate-300 p-8 rounded text-center mt-4">
-                  <p className="text-sm font-bold text-slate-600">No active alerts</p>
+                <div className="bg-slate-50 border-2 border-dashed border-slate-300 p-8 rounded-xl text-center mt-4">
+                  <p className="text-base font-bold text-slate-600">No active alerts</p>
                 </div>
               ) : (
                 reports.map((rep) => (
-                  <div key={rep.id} className="bg-white border border-slate-200 p-3.5 rounded space-y-2 shadow-sm">
-                    <div className="flex justify-between"><span className="text-xs font-bold">{rep.routeName}</span><span className="text-[10px] text-slate-500">{rep.timestamp}</span></div>
-                    <div className="flex gap-1.5"><span className="bg-slate-100 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">{rep.issueType}</span><span className="text-xs text-slate-600">@ {rep.stopName}</span></div>
-                    <p className="text-xs text-slate-700">{rep.comment}</p>
+                  <div key={rep.id} className="bg-white border border-slate-200 p-4 rounded-xl space-y-2 shadow-sm">
+                    <div className="flex justify-between"><span className="text-sm font-bold text-slate-900">{rep.routeName}</span><span className="text-xs text-slate-500">{rep.timestamp}</span></div>
+                    <div className="flex gap-2 flex-wrap"><span className="bg-slate-100 px-2 py-1 rounded text-xs font-bold border border-slate-200">{rep.issueType}</span><span className="text-sm text-slate-600">@ {rep.stopName}</span></div>
+                    <p className="text-sm text-slate-700 pt-1">{rep.comment}</p>
                   </div>
                 ))
               )}
@@ -247,18 +261,6 @@ export default function NationalTransitApp() {
           )}
         </div>
       </aside>
-
-      <main className="flex-1 bg-slate-200 relative z-10 h-[45%] md:h-full border-t md:border-l border-slate-300">
-        <TransitMap
-          routes={activeRoutes}
-          activeLegs={journeyData ? journeyData.legs : null}
-          hoveredLegIndex={hoveredLegIndex}
-          userCoords={userCoords}
-          cityCenter={activeCityConfig.center}
-          onSelectAsOrigin={(s) => setSelectedOrigin(s)}
-          onSelectAsDestination={(s) => setSelectedDestination(s)}
-        />
-      </main>
 
       <ReportModal isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)} onSuccess={(newRep) => { setReports([newRep, ...reports]); setActiveTab("reports"); }} activeRoutes={activeRoutes} initialStopName={selectedOrigin ? selectedOrigin.name : ""} isUrdu={isUrdu} />
     </div>

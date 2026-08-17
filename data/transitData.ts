@@ -141,13 +141,29 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       fareRule: "Flat Rs. 30",
       stops: [
         { id: "ir-1", name: "Saddar", lat: 33.5939, lng: 73.0538 },
-        { id: "ir-2", name: "Liaquat Bagh", lat: 33.6050, lng: 73.0640 },
-        { id: "ir-4", name: "Chandni Chowk", lat: 33.6300, lng: 73.0730 },
-        { id: "ir-6", name: "Faizabad", lat: 33.6610, lng: 73.0800 },
-        { id: "ir-7", name: "IJP", lat: 33.6650, lng: 73.0700 },
-        { id: "ir-9", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
-        { id: "ir-10", name: "PIMS", lat: 33.7050, lng: 73.0500 },
-        { id: "ir-13", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
+        { id: "ir-2", name: "Marrir Chowk", lat: 33.5980, lng: 73.0570 },
+        { id: "ir-3", name: "Liaquat Bagh", lat: 33.6050, lng: 73.0640 },
+        { id: "ir-4", name: "Committee Chowk", lat: 33.6120, lng: 73.0670 },
+        { id: "ir-5", name: "Waris Khan", lat: 33.6180, lng: 73.0700 },
+        { id: "ir-6", name: "Chandni Chowk", lat: 33.6300, lng: 73.0730 },
+        { id: "ir-7", name: "Rehmanabad", lat: 33.6360, lng: 73.0760 },
+        { id: "ir-8", name: "6th Road", lat: 33.6420, lng: 73.0780 },
+        { id: "ir-9", name: "Shamsabad (Arid University)", lat: 33.6520, lng: 73.0800 },
+        { id: "ir-10", name: "Faizabad", lat: 33.6610, lng: 73.0800 },
+        { id: "ir-11", name: "IJP Road", lat: 33.6650, lng: 73.0700 },
+        { id: "ir-12", name: "Potohar", lat: 33.6680, lng: 73.0650 },
+        { id: "ir-13", name: "Khayaban-e-Johar", lat: 33.6710, lng: 73.0600 },
+        { id: "ir-14", name: "Faiz Ahmed Faiz", lat: 33.6750, lng: 73.0550 },
+        { id: "ir-15", name: "Peshawar Morr (Kashmir Hwy)", lat: 33.6900, lng: 73.0450 },
+        { id: "ir-16", name: "Chaman", lat: 33.6940, lng: 73.0470 },
+        { id: "ir-17", name: "Ibn-e-Sina", lat: 33.6980, lng: 73.0480 },
+        { id: "ir-18", name: "Katchery", lat: 33.7010, lng: 73.0490 },
+        { id: "ir-19", name: "PIMS", lat: 33.7050, lng: 73.0500 },
+        { id: "ir-20", name: "Stock Exchange", lat: 33.7080, lng: 73.0550 },
+        { id: "ir-21", name: "7th Avenue", lat: 33.7120, lng: 73.0650 },
+        { id: "ir-22", name: "Shaheed-e-Millat", lat: 33.7160, lng: 73.0750 },
+        { id: "ir-23", name: "Parade Ground", lat: 33.7190, lng: 73.0850 },
+        { id: "ir-24", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
       ]
     },
     {
@@ -160,9 +176,11 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       baseFare: 50,
       fareRule: "Flat Rs. 50",
       stops: [
-        { id: "io-1", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
+        { id: "io-1", name: "Peshawar Morr (Kashmir Hwy)", lat: 33.6900, lng: 73.0450 },
         { id: "io-2", name: "G-10 Station", lat: 33.6700, lng: 73.0150 },
         { id: "io-3", name: "NUST", lat: 33.6450, lng: 72.9900 },
+        { id: "io-4", name: "G-13", lat: 33.6350, lng: 72.9750 },
+        { id: "io-5", name: "N-5 Interchange", lat: 33.6150, lng: 72.9250 },
         { id: "io-6", name: "Islamabad International Airport", lat: 33.5550, lng: 72.8250 }
       ]
     }

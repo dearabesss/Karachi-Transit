@@ -39,7 +39,7 @@ interface TransitMapProps {
   activeLegs: RouteLeg[] | null;
   userCoords: [number, number] | null;
   nearestStop: BusStop | null;
-  cityCenter: [number, number]; // NEW: Pass the city center
+  cityCenter: [number, number];
   onSelectAsOrigin: (stop: BusStop) => void;
   onSelectAsDestination: (stop: BusStop) => void;
 }
@@ -54,7 +54,6 @@ export default function TransitMap({
   onSelectAsDestination,
 }: TransitMapProps) {
   
-  // Center priorities: Nearest Stop > User GPS > City Default Center
   const centerPos: [number, number] = nearestStop
     ? [nearestStop.lat, nearestStop.lng]
     : userCoords || cityCenter;

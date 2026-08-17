@@ -1,12 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    // Next.js App Directory
+    // Catches standard root directories
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    // Components Directory
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    // If you placed data files that include Tailwind class strings (like our badge colors)
-    "./data/**/*.{js,ts,jsx,tsx}",
+    "./data/**/*.{js,ts,jsx,tsx,mdx}",
+    
+    // Catches everything if you used the 'src' directory during setup
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {

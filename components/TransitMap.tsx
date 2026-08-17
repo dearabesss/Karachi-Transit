@@ -40,6 +40,7 @@ interface TransitMapProps {
   hoveredLegIndex: number | null;
   cityCenter: [number, number];
   userCoords: [number, number] | null;
+  includeWomenOnly: boolean;
   onSelectAsOrigin: (stop: BusStop) => void;
   onSelectAsDestination: (stop: BusStop) => void;
 }
@@ -50,6 +51,7 @@ export default function TransitMap({
   hoveredLegIndex,
   cityCenter,
   userCoords,
+  includeWomenOnly,
   onSelectAsOrigin,
   onSelectAsDestination,
 }: TransitMapProps) {
@@ -90,6 +92,8 @@ export default function TransitMap({
       )}
 
       {!activeLegs && routes.map((route) => {
+        if (route.service.includes("Women") && !includeWomenOnly) return null;
+        
         const coords: [number, number][] = route.stops.map((s) => [s.lat, s.lng]);
         return (
           <Polyline
@@ -130,8 +134,10 @@ export default function TransitMap({
           );
         })}
 
-      {routes.map((route) =>
-        route.stops.map((stop) => {
+      {routes.map((route) => {
+        if (route.service.includes("Women") && !includeWomenOnly) return null;
+        
+        return route.stops.map((stop) => {
           if (activeLegs && !activeStops.has(stop.id)) return null;
 
           return (
@@ -151,8 +157,8 @@ export default function TransitMap({
               </Popup>
             </Marker>
           );
-        })
-      )}
+        });
+      })}
     </MapContainer>
   );
 }

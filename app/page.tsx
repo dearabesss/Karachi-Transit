@@ -28,7 +28,6 @@ export default function NationalTransitApp() {
   const [isUrdu, setIsUrdu] = useState(false);
   const [selectedCityId, setSelectedCityId] = useState<CityId>("karachi");
   const [activeTab, setActiveTab] = useState<"plan" | "reports">("plan");
-  const [includeWomenOnly, setIncludeWomenOnly] = useState<boolean>(false);
   
   const [selectedOrigin, setSelectedOrigin] = useState<BusStop | null>(null);
   const [selectedDestination, setSelectedDestination] = useState<BusStop | null>(null);
@@ -57,17 +56,13 @@ export default function NationalTransitApp() {
     setSelectedOrigin(null);
     setSelectedDestination(null);
     setUserCoords(null);
-    setIncludeWomenOnly(false);
   };
 
   const allStops = useMemo(() => {
     const map = new Map<string, BusStop>();
-    activeRoutes.forEach((r) => {
-      if (r.service.includes("Women") && !includeWomenOnly) return;
-      r.stops.forEach((s) => { if (!map.has(s.name)) map.set(s.name, s); });
-    });
+    activeRoutes.forEach((r) => r.stops.forEach((s) => { if (!map.has(s.name)) map.set(s.name, s); }));
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }, [activeRoutes, includeWomenOnly]);
+  }, [activeRoutes]);
 
   const handleGetLocationAndSetOrigin = () => {
     if (navigator.geolocation) {
@@ -80,7 +75,6 @@ export default function NationalTransitApp() {
           let closest: BusStop | null = null;
           let minDistance = Infinity;
           activeRoutes.forEach((r) => {
-            if (r.service.includes("Women") && !includeWomenOnly) return;
             r.stops.forEach((s) => {
               const d = getDistanceKm(lat, lng, s.lat, s.lng);
               if (d < minDistance) {
@@ -101,13 +95,13 @@ export default function NationalTransitApp() {
 
   const journeyData = useMemo(() => {
     if (!selectedOrigin || !selectedDestination || selectedOrigin.name === selectedDestination.name) return null;
-    return findFastestRoute(selectedOrigin, selectedDestination, activeRoutes, includeWomenOnly);
-  }, [selectedOrigin, selectedDestination, activeRoutes, includeWomenOnly]);
+    return findFastestRoute(selectedOrigin, selectedDestination, activeRoutes);
+  }, [selectedOrigin, selectedDestination, activeRoutes]);
 
   return (
     <div className="flex flex-col h-[100dvh] bg-white md:flex-row font-sans text-slate-900 overflow-hidden">
       
-      {/* MAP VIEW - On Mobile it is on TOP */}
+      {/* MAP VIEW - On Mobile it is on TOP, on Desktop it is on the RIGHT */}
       <main className="flex-1 bg-slate-200 relative z-0 h-[35dvh] md:h-full w-full order-1 md:order-2 border-b md:border-b-0 md:border-l border-slate-300">
         <TransitMap
           routes={activeRoutes}
@@ -120,10 +114,10 @@ export default function NationalTransitApp() {
         />
       </main>
 
-      {/* CONTROLS PANEL - On Mobile it is on BOTTOM */}
+      {/* CONTROLS PANEL - On Mobile it is on BOTTOM, on Desktop it is on the LEFT */}
       <aside className="w-full md:w-[420px] bg-white flex flex-col z-20 shrink-0 h-[65dvh] md:h-full order-2 md:order-1 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] md:shadow-none rounded-t-2xl md:rounded-none -mt-4 md:mt-0 relative overflow-hidden">
         
-        {/* Mobile Drag Handle */}
+        {/* Mobile Drag Handle Visualizer */}
         <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mt-2.5 mb-1.5 md:hidden"></div>
 
         <header className="px-5 pb-3 pt-2 md:pt-4 bg-white text-slate-900 flex items-center justify-between shrink-0 border-b border-slate-200">
@@ -189,22 +183,6 @@ export default function NationalTransitApp() {
                     {allStops.map((s) => <option key={`d-${s.name}`} value={s.name}>{s.name}</option>)}
                   </select>
                 </div>
-
-                {selectedCityId === "karachi" && (
-                  <div className="pt-1">
-                    <label className="flex items-center gap-2 cursor-pointer bg-pink-50 border border-pink-200 p-2.5 rounded-lg hover:bg-pink-100 transition-colors">
-                      <input 
-                        type="checkbox" 
-                        className="w-4 h-4 accent-pink-600 rounded cursor-pointer"
-                        checked={includeWomenOnly}
-                        onChange={(e) => setIncludeWomenOnly(e.target.checked)}
-                      />
-                      <span className="text-xs font-bold text-pink-900">
-                        {isUrdu ? "خواتین کے مخصوص روٹس شامل کریں (پنک بس)" : "Include Women-Only Routes (Pink Bus)"}
-                      </span>
-                    </label>
-                  </div>
-                )}
               </div>
 
               {journeyData ? (

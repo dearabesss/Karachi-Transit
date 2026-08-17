@@ -9,30 +9,28 @@ const defaultStopIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [22, 36],
-  iconAnchor: [11, 36],
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
   popupAnchor: [0, -32],
-  shadowSize: [36, 36],
+  shadowSize: [41, 41],
 });
 
 const userPinIcon = L.divIcon({
   className: "user-loc-pin",
-  html: `<div style="background-color: #2563eb; width: 16px; height: 16px; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #2563eb;"></div>`,
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
+  html: `<div style="background-color: #2563eb; width: 18px; height: 18px; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #2563eb;"></div>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
 });
 
-function MapViewController({
-  center,
-  zoom,
-}: {
-  center: [number, number];
-  zoom?: number;
-}) {
+function MapViewController({ center, zoom, bounds }: { center: [number, number]; zoom?: number; bounds?: L.LatLngBounds }) {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(center, zoom || map.getZoom(), { duration: 0.8 });
-  }, [center, zoom, map]);
+    if (bounds) {
+      map.fitBounds(bounds, { padding: [50, 50], duration: 0.8 });
+    } else {
+      map.flyTo(center, zoom || map.getZoom(), { duration: 0.8 });
+    }
+  }, [center, zoom, bounds, map]);
   return null;
 }
 
@@ -57,6 +55,26 @@ export default function TransitMap({
     ? [nearestStop.lat, nearestStop.lng]
     : userCoords || [24.8934, 67.0822];
 
+  // Calculate bounding box if active legs exist so the map automatically frames the journey
+  let journeyBounds: L.LatLngBounds | undefined;
+  if (activeLegs && activeLegs.length > 0) {
+    const latLngs: [number, number][] = [];
+    activeLegs.forEach(leg => {
+      latLngs.push([leg.startStop.lat, leg.startStop.lng]);
+      latLngs.push([leg.endStop.lat, leg.endStop.lng]);
+    });
+    journeyBounds = L.latLngBounds(latLngs);
+  }
+
+  // Identify stops involved in the active journey to hide the rest
+  const activeStops = new Set<string>();
+  if (activeLegs) {
+    activeLegs.forEach(leg => {
+      activeStops.add(leg.startStop.id);
+      activeStops.add(leg.endStop.id);
+    });
+  }
+
   return (
     <MapContainer center={centerPos} zoom={12} scrollWheelZoom={true} className="w-full h-full">
       <TileLayer
@@ -64,22 +82,21 @@ export default function TransitMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <MapViewController center={centerPos} />
+      <MapViewController center={centerPos} bounds={journeyBounds} />
 
       {/* User GPS Pin */}
       {userCoords && (
         <Marker position={userCoords} icon={userPinIcon}>
           <Popup>
-            <div className="p-1 font-sans text-xs">
-              <strong className="block text-slate-900 font-bold">Your Location</strong>
-              <span className="text-slate-500">Live GPS Coordinates</span>
+            <div className="p-2 font-sans">
+              <strong className="block text-slate-900 text-sm font-bold">Your Location</strong>
             </div>
           </Popup>
         </Marker>
       )}
 
-      {/* Default Bus Route Lines */}
-      {routes.map((route) => {
+      {/* Default Bus Route Lines (ONLY SHOW IF NO ACTIVE JOURNEY) */}
+      {!activeLegs && routes.map((route) => {
         const coords: [number, number][] = route.stops.map((s) => [s.lat, s.lng]);
         return (
           <Polyline
@@ -87,8 +104,8 @@ export default function TransitMap({
             positions={coords}
             pathOptions={{
               color: route.colorHex,
-              weight: activeLegs ? 2 : 4,
-              opacity: activeLegs ? 0.3 : 0.85,
+              weight: 4,
+              opacity: 0.7,
             }}
           />
         );
@@ -106,10 +123,10 @@ export default function TransitMap({
                   [leg.endStop.lat, leg.endStop.lng],
                 ]}
                 pathOptions={{
-                  color: "#475569",
-                  weight: 4,
-                  dashArray: "6, 8",
-                  opacity: 0.9,
+                  color: "#334155",
+                  weight: 5,
+                  dashArray: "8, 10",
+                  opacity: 1,
                 }}
               />
             );
@@ -123,56 +140,61 @@ export default function TransitMap({
               ]}
               pathOptions={{
                 color: leg.route?.colorHex || "#0f172a",
-                weight: 7,
+                weight: 8,
                 opacity: 1,
               }}
             />
           );
         })}
 
-      {/* Stop Markers */}
+      {/* Stop Markers - Filtered if activeLegs is present */}
       {routes.map((route) =>
-        route.stops.map((stop) => (
-          <Marker
-            key={`${route.id}-${stop.id}`}
-            position={[stop.lat, stop.lng]}
-            icon={defaultStopIcon}
-          >
-            <Popup>
-              <div className="p-1.5 font-sans min-w-[180px]">
-                <span
-                  className="inline-block px-1.5 py-0.5 text-[10px] font-bold text-white rounded mb-1"
-                  style={{ backgroundColor: route.colorHex }}
-                >
-                  {route.service}
-                </span>
-                <p className="font-bold text-slate-900 text-sm">{stop.name}</p>
-                <p className="text-slate-500 text-[11px] mb-2">{route.fareRule}</p>
-                
-                <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectAsOrigin(stop);
-                    }}
-                    className="bg-emerald-700 text-white text-[10px] font-semibold py-1 rounded hover:bg-emerald-800 text-center"
+        route.stops.map((stop) => {
+          // If a journey is selected, only show markers for stops on that journey
+          if (activeLegs && !activeStops.has(stop.id)) return null;
+
+          return (
+            <Marker
+              key={`${route.id}-${stop.id}`}
+              position={[stop.lat, stop.lng]}
+              icon={defaultStopIcon}
+            >
+              <Popup>
+                <div className="p-2 font-sans min-w-[200px]">
+                  <span
+                    className="inline-block px-2 py-1 text-xs font-bold text-white rounded mb-2"
+                    style={{ backgroundColor: route.colorHex }}
                   >
-                    Set Origin
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectAsDestination(stop);
-                    }}
-                    className="bg-slate-900 text-white text-[10px] font-semibold py-1 rounded hover:bg-slate-800 text-center"
-                  >
-                    Set Dest
-                  </button>
+                    {route.service}
+                  </span>
+                  <p className="font-bold text-slate-900 text-base">{stop.name}</p>
+                  <p className="text-slate-600 text-sm mb-3">{route.fareRule}</p>
+                  
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectAsOrigin(stop);
+                      }}
+                      className="bg-slate-100 text-slate-800 border border-slate-300 text-sm font-bold py-2 rounded hover:bg-slate-200 text-center"
+                    >
+                      Set Origin
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectAsDestination(stop);
+                      }}
+                      className="bg-slate-900 text-white border border-slate-900 text-sm font-bold py-2 rounded hover:bg-slate-800 text-center"
+                    >
+                      Set Dest
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))
+              </Popup>
+            </Marker>
+          );
+        })
       )}
     </MapContainer>
   );

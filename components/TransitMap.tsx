@@ -17,18 +17,18 @@ const defaultStopIcon = L.icon({
 
 const userPinIcon = L.divIcon({
   className: "user-loc-pin",
-  html: `<div style="background-color: #2563eb; width: 18px; height: 18px; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #2563eb;"></div>`,
-  iconSize: [18, 18],
-  iconAnchor: [9, 9],
+  html: `<div style="background-color: #2563eb; width: 20px; height: 20px; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #2563eb;"></div>`,
+  iconSize: [20, 20],
+  iconAnchor: [10, 10],
 });
 
 function MapViewController({ center, bounds }: { center: [number, number]; bounds?: L.LatLngBounds }) {
   const map = useMap();
   useEffect(() => {
     if (bounds) {
-      map.fitBounds(bounds, { padding: [50, 50], duration: 0.8 });
+      map.fitBounds(bounds, { padding: [30, 30], duration: 0.8 });
     } else {
-      map.flyTo(center, 13, { duration: 0.8 });
+      map.flyTo(center, 12, { duration: 0.8 });
     }
   }, [center, bounds, map]);
   return null;
@@ -75,7 +75,7 @@ export default function TransitMap({
   }
 
   return (
-    <MapContainer center={cityCenter} zoom={13} scrollWheelZoom={true} className="w-full h-full">
+    <MapContainer center={cityCenter} zoom={12} scrollWheelZoom={true} className="w-full h-full z-0">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -85,7 +85,7 @@ export default function TransitMap({
 
       {userCoords && (
         <Marker position={userCoords} icon={userPinIcon}>
-          <Popup><strong className="font-sans text-xs">Your Location</strong></Popup>
+          <Popup><strong className="font-sans text-xs">Your GPS Location</strong></Popup>
         </Marker>
       )}
 
@@ -123,8 +123,8 @@ export default function TransitMap({
               positions={[ [leg.startStop.lat, leg.startStop.lng], [leg.endStop.lat, leg.endStop.lng] ]}
               pathOptions={{
                 color: leg.route?.colorHex || "#0f172a",
-                weight: isHovered ? 10 : 7,
-                opacity: isHovered ? 1 : 0.8,
+                weight: isHovered ? 10 : 6,
+                opacity: isHovered ? 1 : 0.85,
               }}
             />
           );
@@ -137,15 +137,15 @@ export default function TransitMap({
           return (
             <Marker key={`${route.id}-${stop.id}`} position={[stop.lat, stop.lng]} icon={defaultStopIcon}>
               <Popup>
-                <div className="p-2 font-sans min-w-[200px]">
+                <div className="p-3 font-sans min-w-[200px]">
                   <span className="inline-block px-2 py-1 text-xs font-bold text-white rounded mb-2" style={{ backgroundColor: route.colorHex }}>
                     {route.service}
                   </span>
-                  <p className="font-bold text-slate-900 text-base">{stop.name}</p>
-                  <p className="text-slate-600 text-sm mb-3">{route.fareRule}</p>
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
-                    <button onClick={(e) => { e.stopPropagation(); onSelectAsOrigin(stop); }} className="bg-slate-100 text-slate-800 border border-slate-300 text-sm font-bold py-2 rounded hover:bg-slate-200 text-center">Set Origin</button>
-                    <button onClick={(e) => { e.stopPropagation(); onSelectAsDestination(stop); }} className="bg-slate-900 text-white border border-slate-900 text-sm font-bold py-2 rounded hover:bg-slate-800 text-center">Set Dest</button>
+                  <p className="font-bold text-slate-900 text-lg leading-tight">{stop.name}</p>
+                  <p className="text-slate-600 text-xs mb-3 mt-1">{route.fareRule}</p>
+                  <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-200">
+                    <button onClick={(e) => { e.stopPropagation(); onSelectAsOrigin(stop); }} className="bg-slate-100 text-slate-800 border border-slate-300 text-sm font-bold py-2.5 rounded hover:bg-slate-200 text-center">Set Origin</button>
+                    <button onClick={(e) => { e.stopPropagation(); onSelectAsDestination(stop); }} className="bg-slate-900 text-white border border-slate-900 text-sm font-bold py-2.5 rounded hover:bg-slate-800 text-center">Set Dest</button>
                   </div>
                 </div>
               </Popup>

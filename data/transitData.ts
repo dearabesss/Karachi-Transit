@@ -27,7 +27,7 @@ export interface DelayReport {
   timestamp: string;
 }
 
-export type CityId = "karachi" | "twin_cities";
+export type CityId = "karachi" | "twin_cities" | "lahore";
 
 export interface CityConfig {
   id: CityId;
@@ -39,6 +39,7 @@ export interface CityConfig {
 export const CITIES: CityConfig[] = [
   { id: "karachi", name: "Karachi", urduName: "کراچی", center: [24.8934, 67.0822] },
   { id: "twin_cities", name: "Islamabad & Rawalpindi", urduName: "اسلام آباد / راولپنڈی", center: [33.6444, 73.0679] },
+  { id: "lahore", name: "Lahore", urduName: "لاہور", center: [31.5204, 74.3587] },
 ];
 
 export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
@@ -80,15 +81,11 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       stops: [
         { id: "r1-1", name: "Model Colony", lat: 24.8978, lng: 67.1895 },
         { id: "r1-2", name: "Malir Halt", lat: 24.8894, lng: 67.1702 },
-        { id: "r1-3", name: "Colony Gate", lat: 24.8860, lng: 67.1620 },
         { id: "r1-4", name: "Jinnah Airport Terminal 1", lat: 24.8821, lng: 67.1425 },
         { id: "r1-5", name: "Drigh Road Station", lat: 24.8789, lng: 67.1192 },
-        { id: "r1-6", name: "PAF Base Faisal", lat: 24.8750, lng: 67.1050 },
-        { id: "r1-7", name: "Karsaz (Shahrah-e-Faisal)", lat: 24.8721, lng: 67.0876 },
-        { id: "r1-8", name: "Nursery", lat: 24.8680, lng: 67.0750 },
+        { id: "r1-7", name: "Karsaz", lat: 24.8721, lng: 67.0876 },
         { id: "r1-9", name: "FTC (Baloch Colony)", lat: 24.8624, lng: 67.0612 },
         { id: "r1-10", name: "Metropole Hotel", lat: 24.8528, lng: 67.0298 },
-        { id: "r1-11", name: "Arts Council", lat: 24.8542, lng: 67.0195 },
         { id: "r1-12", name: "Merewether Tower", lat: 24.8485, lng: 66.9998 },
         { id: "r1-13", name: "Dockyard", lat: 24.8420, lng: 66.9850 }
       ]
@@ -105,13 +102,11 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       stops: [
         { id: "r2-1", name: "North Karachi Sector 5", lat: 25.0020, lng: 67.0710 },
         { id: "r2-2", name: "Nagan Chowrangi", lat: 24.9682, lng: 67.0667 },
-        { id: "r2-3", name: "Sohrab Goth", lat: 24.9450, lng: 67.0870 },
         { id: "r2-4", name: "NIPA Chowrangi", lat: 24.9192, lng: 67.0984 },
         { id: "r2-5", name: "Johar Mor", lat: 24.9150, lng: 67.1100 },
         { id: "r2-6", name: "Drigh Road Station", lat: 24.8789, lng: 67.1192 },
-        { id: "r2-7", name: "Shah Faisal Colony", lat: 24.8700, lng: 67.1400 },
         { id: "r2-8", name: "Singer Chowrangi", lat: 24.8450, lng: 67.1350 },
-        { id: "r2-9", name: "Indus Hospital Korangi", lat: 24.8250, lng: 67.1210 }
+        { id: "r2-9", name: "Indus Hospital", lat: 24.8250, lng: 67.1210 }
       ]
     },
     {
@@ -126,13 +121,9 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       stops: [
         { id: "ev3-1", name: "Malir Cantt Check Post 5", lat: 24.9351, lng: 67.1852 },
         { id: "ev3-2", name: "Safoora Chowrangi", lat: 24.9312, lng: 67.1524 },
-        { id: "ev3-3", name: "Mausamiyat", lat: 24.9335, lng: 67.1265 },
-        { id: "ev3-4", name: "University of Karachi (Silver Jubilee)", lat: 24.9348, lng: 67.1118 },
         { id: "ev3-5", name: "NIPA Chowrangi", lat: 24.9192, lng: 67.0984 },
         { id: "ev3-6", name: "Johar Mor", lat: 24.9150, lng: 67.1100 },
-        { id: "ev3-7", name: "Millennium Mall", lat: 24.9050, lng: 67.1000 },
         { id: "ev3-8", name: "National Stadium", lat: 24.8950, lng: 67.0850 },
-        { id: "ev3-9", name: "Aga Khan Hospital", lat: 24.8900, lng: 67.0750 },
         { id: "ev3-10", name: "Jail Chowrangi", lat: 24.8820, lng: 67.0650 },
         { id: "ev3-11", name: "Numaish Chowrangi", lat: 24.8715, lng: 67.0385 }
       ]
@@ -151,16 +142,11 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       stops: [
         { id: "ir-1", name: "Saddar", lat: 33.5939, lng: 73.0538 },
         { id: "ir-2", name: "Liaquat Bagh", lat: 33.6050, lng: 73.0640 },
-        { id: "ir-3", name: "Committee Chowk", lat: 33.6120, lng: 73.0670 },
         { id: "ir-4", name: "Chandni Chowk", lat: 33.6300, lng: 73.0730 },
-        { id: "ir-5", name: "Sixth Road", lat: 33.6420, lng: 73.0780 },
         { id: "ir-6", name: "Faizabad", lat: 33.6610, lng: 73.0800 },
         { id: "ir-7", name: "IJP", lat: 33.6650, lng: 73.0700 },
-        { id: "ir-8", name: "Faiz Ahmed Faiz", lat: 33.6750, lng: 73.0550 },
         { id: "ir-9", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
         { id: "ir-10", name: "PIMS", lat: 33.7050, lng: 73.0500 },
-        { id: "ir-11", name: "7th Avenue", lat: 33.7120, lng: 73.0650 },
-        { id: "ir-12", name: "Parade Ground", lat: 33.7190, lng: 73.0850 },
         { id: "ir-13", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
       ]
     },
@@ -177,9 +163,48 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
         { id: "io-1", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
         { id: "io-2", name: "G-10 Station", lat: 33.6700, lng: 73.0150 },
         { id: "io-3", name: "NUST", lat: 33.6450, lng: 72.9900 },
-        { id: "io-4", name: "G-13", lat: 33.6350, lng: 72.9750 },
-        { id: "io-5", name: "N-5 Interchange", lat: 33.6150, lng: 72.9250 },
         { id: "io-6", name: "Islamabad International Airport", lat: 33.5550, lng: 72.8250 }
+      ]
+    }
+  ],
+  lahore: [
+    {
+      id: "lhr-orange",
+      name: "Orange Line Metro Train",
+      service: "Orange Line Train",
+      colorHex: "#ea580c",
+      badgeBg: "bg-orange-600",
+      badgeText: "text-white",
+      baseFare: 40,
+      fareRule: "Flat Rs. 40",
+      stops: [
+        { id: "lo-1", name: "Ali Town", lat: 31.4620, lng: 74.2460 },
+        { id: "lo-2", name: "Thokar Niaz Baig", lat: 31.4680, lng: 74.2400 },
+        { id: "lo-3", name: "Wahdat Road", lat: 31.5050, lng: 74.2800 },
+        { id: "lo-4", name: "Chauburji", lat: 31.5450, lng: 74.3100 },
+        { id: "lo-5", name: "Anarkali", lat: 31.5600, lng: 74.3150 },
+        { id: "lo-6", name: "Railway Station", lat: 31.5750, lng: 74.3350 },
+        { id: "lo-7", name: "UET", lat: 31.5800, lng: 74.3500 },
+        { id: "lo-8", name: "Shalimar Gardens", lat: 31.5850, lng: 74.3800 },
+        { id: "lo-9", name: "Dera Gujran", lat: 31.5900, lng: 74.4000 }
+      ]
+    },
+    {
+      id: "lhr-metro",
+      name: "Lahore Metrobus",
+      service: "Green Line BRT",
+      colorHex: "#047857",
+      badgeBg: "bg-emerald-700",
+      badgeText: "text-white",
+      baseFare: 30,
+      fareRule: "Flat Rs. 30",
+      stops: [
+        { id: "lm-1", name: "Shahdara", lat: 31.6200, lng: 74.2850 },
+        { id: "lm-2", name: "Azadi Chowk", lat: 31.5900, lng: 74.3050 },
+        { id: "lm-3", name: "MAO College", lat: 31.5550, lng: 74.3080 },
+        { id: "lm-4", name: "Kalma Chowk", lat: 31.5030, lng: 74.3300 },
+        { id: "lm-5", name: "Model Town", lat: 31.4850, lng: 74.3350 },
+        { id: "lm-6", name: "Gajju Matah", lat: 31.3900, lng: 74.3600 }
       ]
     }
   ]
@@ -237,7 +262,7 @@ export function findFastestRoute(
       if (i < route.stops.length - 1) {
         const nextStop = route.stops[i + 1];
         const dist = getDistanceKm(stop.lat, stop.lng, nextStop.lat, nextStop.lng);
-        const speed = route.service.includes("BRT") || route.service.includes("Line") ? 35 : 22;
+        const speed = route.service.includes("Train") ? 45 : route.service.includes("BRT") || route.service.includes("Line") ? 35 : 22;
         const time = (dist / speed) * 60;
         adjacencyList.get(uniqueId)!.push({ target: `${route.id}-${nextStop.id}`, time, type: "RIDE", dist });
       }
@@ -245,7 +270,7 @@ export function findFastestRoute(
       if (i > 0) {
         const prevStop = route.stops[i - 1];
         const dist = getDistanceKm(stop.lat, stop.lng, prevStop.lat, prevStop.lng);
-        const speed = route.service.includes("BRT") || route.service.includes("Line") ? 35 : 22;
+        const speed = route.service.includes("Train") ? 45 : route.service.includes("BRT") || route.service.includes("Line") ? 35 : 22;
         const time = (dist / speed) * 60;
         adjacencyList.get(uniqueId)!.push({ target: `${route.id}-${prevStop.id}`, time, type: "RIDE", dist });
       }
@@ -357,8 +382,10 @@ export function findFastestRoute(
         let initialFare = fromNode.route.baseFare;
         if (fromNode.route.id === "green-line") initialFare = 40;
         totalFare += initialFare;
-        const speed = fromNode.route.service.includes("BRT") || fromNode.route.service.includes("Line") ? 35 : 22;
+        
+        const speed = fromNode.route.service.includes("Train") ? 45 : fromNode.route.service.includes("BRT") || fromNode.route.service.includes("Line") ? 35 : 22;
         const timeRide = (transition.dist / speed) * 60;
+        
         currentLeg = {
           type: "RIDE",
           route: fromNode.route,
@@ -373,8 +400,10 @@ export function findFastestRoute(
       } else {
         currentLeg.endStop = toNode.stop;
         currentLeg.distanceKm += transition.dist;
-        const speed = currentLeg.route?.service.includes("BRT") || currentLeg.route?.service.includes("Line") ? 35 : 22;
+        
+        const speed = currentLeg.route?.service.includes("Train") ? 45 : currentLeg.route?.service.includes("BRT") || currentLeg.route?.service.includes("Line") ? 35 : 22;
         const timeRide = (transition.dist / speed) * 60;
+        
         currentLeg.timeMins += timeRide;
         totalTime += timeRide;
         currentLeg.stopsPassed = (currentLeg.stopsPassed || 1) + 1;

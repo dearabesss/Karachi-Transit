@@ -23,7 +23,7 @@ import {
 const TransitMap = dynamic(() => import("@/components/TransitMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-600 text-base font-medium">
+    <div className="w-full h-full flex items-center justify-center bg-slate-200 text-slate-600 text-sm font-medium">
       Loading Map Data...
     </div>
   ),
@@ -82,9 +82,7 @@ export default function KarachiTransitApp() {
           });
           if (closest) setSelectedOrigin(closest);
         },
-        () => {
-          alert("Location access denied.");
-        }
+        () => alert("Location access denied.")
       );
     }
   };
@@ -99,158 +97,134 @@ export default function KarachiTransitApp() {
   return (
     <div className="flex flex-col h-screen bg-white md:flex-row font-sans text-slate-900 overflow-hidden">
       
-      {/* SIDEBAR PANEL */}
-      <aside className="w-full md:w-[480px] bg-white border-r border-slate-300 flex flex-col z-20 shrink-0 h-[55%] md:h-full">
+      {/* COMPACT SIDEBAR PANEL */}
+      <aside className="w-full md:w-[400px] bg-white border-r border-slate-300 flex flex-col z-20 shrink-0 h-[55%] md:h-full">
         
-        {/* Header */}
-        <header className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between shrink-0">
+        <header className="px-5 py-3 bg-slate-900 text-white flex items-center justify-between shrink-0">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">
+            <h1 className="text-base font-bold tracking-tight">
               {isUrdu ? "کراچی ٹرانزٹ" : "Karachi Transit"}
             </h1>
-            <p className="text-sm text-slate-400 mt-1">Route & Fare Calculator</p>
           </div>
           <button
             onClick={() => setIsUrdu(!isUrdu)}
-            className="flex items-center gap-2 text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 px-3 py-1.5 rounded transition-colors"
+            className="flex items-center gap-1.5 text-xs bg-slate-800 border border-slate-600 px-2 py-1 rounded transition-colors"
           >
-            <Languages className="w-4 h-4 text-white" />
+            <Languages className="w-3.5 h-3.5 text-emerald-400" />
             {isUrdu ? "English" : "اردو"}
           </button>
         </header>
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-slate-200 px-6 pt-4 bg-slate-50 shrink-0">
+        <div className="flex border-b border-slate-200 px-5 pt-3 bg-slate-50 shrink-0">
           <button
             onClick={() => setActiveTab("plan")}
-            className={`pb-3 mr-6 text-sm font-bold uppercase tracking-wider border-b-4 transition-colors ${
+            className={`pb-2 mr-5 text-xs font-bold uppercase tracking-wider border-b-[3px] transition-colors ${
               activeTab === "plan"
                 ? "border-slate-900 text-slate-900"
                 : "border-transparent text-slate-500 hover:text-slate-700"
             }`}
           >
-            {isUrdu ? "روٹ تلاش کریں" : "Plan Trip"}
+            {isUrdu ? "روٹ پلانر" : "Route Planner"}
           </button>
           <button
             onClick={() => setActiveTab("reports")}
-            className={`pb-3 text-sm font-bold uppercase tracking-wider border-b-4 transition-colors flex items-center gap-2 ${
+            className={`pb-2 text-xs font-bold uppercase tracking-wider border-b-[3px] transition-colors flex items-center gap-1.5 ${
               activeTab === "reports"
                 ? "border-slate-900 text-slate-900"
                 : "border-transparent text-slate-500 hover:text-slate-700"
             }`}
           >
             {isUrdu ? "لائیو الرٹس" : "Live Alerts"}
-            <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full leading-none">
               {reports.length}
             </span>
           </button>
         </div>
 
-        {/* Tab Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
           {activeTab === "plan" ? (
             <>
-              {/* Controls */}
-              <div className="space-y-4">
+              {/* Tighter Form */}
+              <div className="space-y-3">
                 <div>
-                  <div className="flex justify-between items-end mb-2">
-                    <label className="text-sm font-bold text-slate-700">
-                      {isUrdu ? "روانگی (کہاں سے؟)" : "Origin (Where from?)"}
+                  <div className="flex justify-between items-end mb-1.5">
+                    <label className="text-xs font-bold text-slate-700 uppercase">
+                      {isUrdu ? "روانگی" : "Origin"}
                     </label>
                     <button
                       onClick={handleGetLocation}
-                      className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                      className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
                     >
-                      <Navigation className="w-4 h-4" />
-                      {isUrdu ? "جی پی ایس لوکیشن" : "Use GPS"}
+                      <Navigation className="w-3 h-3" /> GPS
                     </button>
                   </div>
                   <select
-                    className="w-full border-2 border-slate-300 rounded-lg px-4 py-3 text-base text-slate-900 focus:outline-none focus:border-slate-900 bg-white"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
                     value={selectedOrigin?.name || ""}
-                    onChange={(e) =>
-                      setSelectedOrigin(allStops.find((s) => s.name === e.target.value) || null)
-                    }
+                    onChange={(e) => setSelectedOrigin(allStops.find((s) => s.name === e.target.value) || null)}
                   >
                     <option value="">{isUrdu ? "اسٹاپ منتخب کریں..." : "Select start location..."}</option>
-                    {allStops.map((s) => (
-                      <option key={`o-${s.name}`} value={s.name}>
-                        {s.name}
-                      </option>
-                    ))}
+                    {allStops.map((s) => <option key={`o-${s.name}`} value={s.name}>{s.name}</option>)}
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-bold text-slate-700 block mb-2">
-                    {isUrdu ? "منزل (کہاں جانا ہے؟)" : "Destination (Where to?)"}
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase">
+                    {isUrdu ? "منزل" : "Destination"}
                   </label>
                   <select
-                    className="w-full border-2 border-slate-300 rounded-lg px-4 py-3 text-base text-slate-900 focus:outline-none focus:border-slate-900 bg-white"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
                     value={selectedDestination?.name || ""}
-                    onChange={(e) =>
-                      setSelectedDestination(allStops.find((s) => s.name === e.target.value) || null)
-                    }
+                    onChange={(e) => setSelectedDestination(allStops.find((s) => s.name === e.target.value) || null)}
                   >
                     <option value="">{isUrdu ? "اسٹاپ منتخب کریں..." : "Select destination..."}</option>
-                    {allStops.map((s) => (
-                      <option key={`d-${s.name}`} value={s.name}>
-                        {s.name}
-                      </option>
-                    ))}
+                    {allStops.map((s) => <option key={`d-${s.name}`} value={s.name}>{s.name}</option>)}
                   </select>
                 </div>
               </div>
 
-              {/* Clear divider */}
-              <hr className="border-t-2 border-slate-100" />
-
-              {/* Journey Result */}
               {journeyData ? (
-                <div className="space-y-6">
-                  {/* Totals */}
-                  <div className="flex gap-4">
-                    <div className="flex-1 bg-slate-50 border border-slate-200 p-4 rounded-lg">
-                      <p className="text-sm font-bold text-slate-500 uppercase">{isUrdu ? "کرایہ" : "Fare"}</p>
-                      <p className="text-3xl font-black text-slate-900 mt-1">Rs. {journeyData.totalFare}</p>
+                <div className="space-y-5">
+                  <div className="flex gap-3">
+                    <div className="flex-1 bg-slate-50 border border-slate-200 p-3 rounded">
+                      <p className="text-[11px] font-bold text-slate-500 uppercase">{isUrdu ? "کل کرایہ" : "Total Fare"}</p>
+                      <p className="text-xl font-black text-slate-900 mt-0.5">Rs. {journeyData.totalFare}</p>
                     </div>
-                    <div className="flex-1 bg-slate-50 border border-slate-200 p-4 rounded-lg">
-                      <p className="text-sm font-bold text-slate-500 uppercase">{isUrdu ? "وقت" : "Time"}</p>
-                      <p className="text-3xl font-black text-slate-900 mt-1 flex items-center gap-2">
-                        {journeyData.totalTime} <span className="text-base font-bold text-slate-500">min</span>
+                    <div className="flex-1 bg-slate-50 border border-slate-200 p-3 rounded">
+                      <p className="text-[11px] font-bold text-slate-500 uppercase">{isUrdu ? "وقت" : "Est. Time"}</p>
+                      <p className="text-xl font-black text-slate-900 mt-0.5 flex items-end gap-1">
+                        {journeyData.totalTime} <span className="text-xs font-bold text-slate-500 mb-0.5">min</span>
                       </p>
                     </div>
                   </div>
 
-                  {/* Directions list */}
-                  <div className="space-y-5 border-l-4 border-slate-200 pl-5 ml-2">
+                  <div className="space-y-4 border-l-[3px] border-slate-200 pl-4 ml-1">
                     {journeyData.legs.map((leg, index) => (
                       <div key={index} className="relative">
-                        {/* Dot indicator */}
                         <div 
-                          className="absolute -left-[30px] top-1 w-4 h-4 rounded-full border-4 border-white"
+                          className="absolute -left-[23px] top-1 w-3 h-3 rounded-full border-2 border-white"
                           style={{ backgroundColor: leg.type === "WALK" ? "#94a3b8" : leg.route?.colorHex }}
                         ></div>
                         
-                        <h4 className="text-lg font-bold text-slate-900 leading-none">
-                          {leg.type === "WALK" ? (isUrdu ? "پیدل چلیں" : "Walk") : leg.route?.name}
+                        <h4 className="text-sm font-bold text-slate-900 leading-tight">
+                          {leg.type === "WALK" ? (isUrdu ? "پیدل" : "Transfer / Walk") : leg.route?.name}
                         </h4>
                         
                         {leg.type === "RIDE" && (
-                          <div className="mt-3 space-y-1">
-                            <p className="text-base text-slate-700"><span className="font-bold">Board:</span> {leg.startStop.name}</p>
-                            <p className="text-base text-slate-700"><span className="font-bold">Drop:</span> {leg.endStop.name}</p>
+                          <div className="mt-1.5 space-y-0.5">
+                            <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">Board:</span> {leg.startStop.name}</p>
+                            <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">Drop:</span> {leg.endStop.name}</p>
                           </div>
                         )}
                         
                         {leg.type === "WALK" && (
-                           <p className="text-base text-slate-700 mt-2">To {leg.endStop.name}</p>
+                           <p className="text-xs text-slate-700 mt-1"><span className="font-semibold text-slate-500">To:</span> {leg.endStop.name}</p>
                         )}
 
-                        <div className="mt-2 text-sm font-bold text-slate-500 flex gap-3">
-                          <span>{leg.timeMins} min</span>
+                        <div className="mt-1.5 text-[11px] font-semibold text-slate-500 flex gap-2.5">
+                          <span className="flex items-center gap-1"><Clock className="w-3 h-3"/>{leg.timeMins} min</span>
                           <span>{leg.distanceKm} km</span>
-                          {leg.fare && <span className="text-slate-900">Rs. {leg.fare}</span>}
+                          {leg.fare && <span className="text-slate-800">Rs. {leg.fare}</span>}
                         </div>
                       </div>
                     ))}
@@ -258,47 +232,44 @@ export default function KarachiTransitApp() {
 
                   <button
                     onClick={() => setIsReportModalOpen(true)}
-                    className="w-full bg-red-50 text-red-700 border border-red-200 text-base font-bold py-4 rounded-lg hover:bg-red-100 flex items-center justify-center gap-2 transition-colors"
+                    className="w-full bg-red-50 text-red-700 border border-red-200 text-xs font-bold py-2.5 rounded hover:bg-red-100 flex items-center justify-center gap-1.5"
                   >
-                    <AlertTriangle className="w-5 h-5" />
-                    {isUrdu ? "اس روٹ پر رپورٹ درج کریں" : "Report an Issue on this Route"}
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {isUrdu ? "مسئلہ رپورٹ کریں" : "Report Issue on Route"}
                   </button>
                 </div>
               ) : (
-                <div className="bg-slate-50 border-2 border-dashed border-slate-200 p-8 rounded-lg text-center">
-                  <p className="text-base font-bold text-slate-500">
-                    {isUrdu
-                      ? "اپنا راستہ دیکھنے کے لیے اوپر اسٹاپ منتخب کریں"
-                      : "Select your starting and ending locations above to calculate the route."}
+                <div className="bg-slate-50 border border-dashed border-slate-300 p-6 rounded text-center">
+                  <p className="text-sm font-medium text-slate-500">
+                    {isUrdu ? "راستہ تلاش کرنے کے لیے اسٹاپس منتخب کریں" : "Select locations to generate route"}
                   </p>
                 </div>
               )}
             </>
           ) : (
-            /* Reports Feed */
-            <div className="space-y-4">
+            <div className="space-y-3">
               <button
                 onClick={() => setIsReportModalOpen(true)}
-                className="w-full bg-slate-900 text-white text-base font-bold py-4 rounded-lg hover:bg-slate-800 transition-colors"
+                className="w-full bg-slate-900 text-white text-sm font-bold py-2.5 rounded hover:bg-slate-800"
               >
-                + {isUrdu ? "نئی رپورٹ شامل کریں" : "Post a Live Update"}
+                + {isUrdu ? "نئی رپورٹ شامل کریں" : "Post Update"}
               </button>
 
               {reports.map((rep) => (
-                <div key={rep.id} className="bg-white border-2 border-slate-200 p-5 rounded-lg space-y-3">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                    <span className="text-sm font-bold text-slate-900">{rep.routeName}</span>
-                    <span className="text-sm font-medium text-slate-500">{rep.timestamp}</span>
+                <div key={rep.id} className="bg-white border border-slate-200 p-3.5 rounded space-y-2 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900">{rep.routeName}</span>
+                    <span className="text-[10px] font-medium text-slate-500">{rep.timestamp}</span>
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    <span className="bg-slate-100 text-slate-900 px-3 py-1 rounded text-sm font-bold border border-slate-300">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
                       {rep.issueType}
                     </span>
-                    <span className="text-slate-700 font-medium text-sm">@ {rep.stopName}</span>
+                    <span className="text-slate-600 font-medium text-xs">@ {rep.stopName}</span>
                   </div>
                   
-                  <p className="text-base text-slate-800 pt-2">{rep.comment}</p>
+                  <p className="text-xs text-slate-700 pt-1 leading-relaxed">{rep.comment}</p>
                 </div>
               ))}
             </div>
@@ -306,13 +277,12 @@ export default function KarachiTransitApp() {
         </div>
       </aside>
 
-      {/* MAP VIEW */}
       <main className="flex-1 bg-slate-200 relative z-10 h-[45%] md:h-full border-t md:border-t-0 md:border-l border-slate-300">
         <TransitMap
           routes={TRANSIT_ROUTES}
           activeLegs={journeyData ? journeyData.legs : null}
           userCoords={userCoords}
-          nearestStop={null} // Map centers natively on bounding box now
+          nearestStop={null} 
           onSelectAsOrigin={(s) => setSelectedOrigin(s)}
           onSelectAsDestination={(s) => setSelectedDestination(s)}
         />

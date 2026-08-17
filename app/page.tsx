@@ -73,7 +73,7 @@ export default function KarachiTransitPage() {
   }, [selectedRouteId]);
 
   // Find nearest stop to current user coordinates
-  const nearestStop = useMemo(() => {
+ const nearestStop = useMemo(() => {
     if (!userCoords) return null;
     let closest: BusStop | null = null;
     let minDistance = Infinity;
@@ -87,7 +87,12 @@ export default function KarachiTransitPage() {
         }
       });
     });
-    return closest ? { ...closest, distance: minDistance } : null;
+
+    // Explicitly check for null to satisfy TypeScript's strict mode
+    if (!closest) return null;
+
+    // Use "as BusStop" so TypeScript knows it's an object, allowing the spread operator
+    return { ...(closest as BusStop), distance: minDistance };
   }, [userCoords]);
 
   // GPS auto-locate

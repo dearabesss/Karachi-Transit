@@ -110,6 +110,42 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       ]
     },
     {
+      id: "orange-line-brt",
+      name: "Orangi Town to Board Office",
+      service: "Orange Line BRT",
+      colorHex: "#ea580c",
+      badgeBg: "bg-orange-600",
+      badgeText: "text-white",
+      baseFare: 30,
+      fareRule: "Flat Rs. 30",
+      stops: [
+        { id: "ol-1", name: "TMA Office Orangi", lat: 24.9450, lng: 67.0010 },
+        { id: "ol-2", name: "Faiz Fazaia", lat: 24.9400, lng: 67.0090 },
+        { id: "ol-3", name: "Jinnah University", lat: 24.9350, lng: 67.0180 },
+        { id: "ol-4", name: "Board Office (Orange)", lat: 24.9298, lng: 67.0345 } // Connects to Green Line!
+      ]
+    },
+    {
+      id: "pink-r1",
+      name: "Pink Route 1 (Women Only)",
+      service: "Pink Bus (Women)",
+      colorHex: "#db2777",
+      badgeBg: "bg-pink-600",
+      badgeText: "text-white",
+      baseFare: 50,
+      fareRule: "Flat Rs. 50 (Women Only)",
+      stops: [
+        { id: "pr1-1", name: "Model Colony", lat: 24.8978, lng: 67.1895 },
+        { id: "pr1-2", name: "Star Gate", lat: 24.8841, lng: 67.1554 },
+        { id: "pr1-3", name: "Karsaz (Shahrah-e-Faisal)", lat: 24.8721, lng: 67.0876 },
+        { id: "pr1-4", name: "Nursery", lat: 24.8680, lng: 67.0750 },
+        { id: "pr1-5", name: "FTC (Baloch Colony)", lat: 24.8624, lng: 67.0612 },
+        { id: "pr1-6", name: "Metropole Hotel", lat: 24.8528, lng: 67.0298 },
+        { id: "pr1-7", name: "Arts Council", lat: 24.8542, lng: 67.0195 },
+        { id: "pr1-8", name: "Merewether Tower", lat: 24.8485, lng: 66.9998 }
+      ]
+    },
+    {
       id: "pbs-ev3",
       name: "EV-3 (Malir Cantt to Numaish)",
       service: "Peoples Bus (EV)",

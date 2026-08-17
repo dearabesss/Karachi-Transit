@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { TransitRoute, BusStop, RouteLeg } from "@/data/transitData";
 
@@ -15,11 +15,11 @@ const defaultStopIcon = L.icon({
   shadowSize: [41, 41],
 });
 
-const customPinIcon = L.divIcon({
-  className: "custom-pin",
-  html: `<div style="background-color: #0f172a; width: 16px; height: 16px; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #0f172a;"></div>`,
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
+const userPinIcon = L.divIcon({
+  className: "user-loc-pin",
+  html: `<div style="background-color: #2563eb; width: 18px; height: 18px; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #2563eb;"></div>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
 });
 
 function MapViewController({ center, bounds }: { center: [number, number]; bounds?: L.LatLngBounds }) {
@@ -34,23 +34,12 @@ function MapViewController({ center, bounds }: { center: [number, number]; bound
   return null;
 }
 
-function MapClickListener({ onMapClick }: { onMapClick: (lat: number, lng: number) => void }) {
-  useMapEvents({
-    click(e) {
-      onMapClick(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-}
-
 interface TransitMapProps {
   routes: TransitRoute[];
   activeLegs: RouteLeg[] | null;
   hoveredLegIndex: number | null;
   cityCenter: [number, number];
-  customOriginCoords: [number, number] | null;
-  customDestCoords: [number, number] | null;
-  onMapClick: (lat: number, lng: number) => void;
+  userCoords: [number, number] | null;
   onSelectAsOrigin: (stop: BusStop) => void;
   onSelectAsDestination: (stop: BusStop) => void;
 }
@@ -60,9 +49,7 @@ export default function TransitMap({
   activeLegs,
   hoveredLegIndex,
   cityCenter,
-  customOriginCoords,
-  customDestCoords,
-  onMapClick,
+  userCoords,
   onSelectAsOrigin,
   onSelectAsDestination,
 }: TransitMapProps) {
@@ -71,8 +58,8 @@ export default function TransitMap({
   if (activeLegs && activeLegs.length > 0) {
     const latLngs: [number, number][] = [];
     activeLegs.forEach(leg => {
-      latLngs.push([leg.startLat, leg.startLng]);
-      latLngs.push([leg.endLat, leg.endLng]);
+      latLngs.push([leg.startStop.lat, leg.startStop.lng]);
+      latLngs.push([leg.endStop.lat, leg.endStop.lng]);
     });
     journeyBounds = L.latLngBounds(latLngs);
   }
@@ -81,8 +68,8 @@ export default function TransitMap({
   if (activeLegs) {
     activeLegs.forEach(leg => {
       if (leg.type === "RIDE") {
-        activeStops.add(`${leg.startLat},${leg.startLng}`);
-        activeStops.add(`${leg.endLat},${leg.endLng}`);
+        activeStops.add(leg.startStop.id);
+        activeStops.add(leg.endStop.id);
       }
     });
   }
@@ -95,16 +82,10 @@ export default function TransitMap({
       />
 
       <MapViewController center={cityCenter} bounds={journeyBounds} />
-      <MapClickListener onMapClick={onMapClick} />
 
-      {customOriginCoords && (
-        <Marker position={customOriginCoords} icon={customPinIcon}>
-          <Popup><strong className="font-sans text-xs">Origin Pin</strong></Popup>
-        </Marker>
-      )}
-      {customDestCoords && (
-        <Marker position={customDestCoords} icon={customPinIcon}>
-          <Popup><strong className="font-sans text-xs">Destination Pin</strong></Popup>
+      {userCoords && (
+        <Marker position={userCoords} icon={userPinIcon}>
+          <Popup><strong className="font-sans text-xs">Your Location</strong></Popup>
         </Marker>
       )}
 
@@ -126,7 +107,7 @@ export default function TransitMap({
             return (
               <Polyline
                 key={`leg-walk-${idx}`}
-                positions={[ [leg.startLat, leg.startLng], [leg.endLat, leg.endLng] ]}
+                positions={[ [leg.startStop.lat, leg.startStop.lng], [leg.endStop.lat, leg.endStop.lng] ]}
                 pathOptions={{
                   color: isHovered ? "#000000" : "#64748b",
                   weight: isHovered ? 6 : 4,
@@ -139,7 +120,7 @@ export default function TransitMap({
           return (
             <Polyline
               key={`leg-ride-${idx}`}
-              positions={[ [leg.startLat, leg.startLng], [leg.endLat, leg.endLng] ]}
+              positions={[ [leg.startStop.lat, leg.startStop.lng], [leg.endStop.lat, leg.endStop.lng] ]}
               pathOptions={{
                 color: leg.route?.colorHex || "#0f172a",
                 weight: isHovered ? 10 : 7,
@@ -151,7 +132,7 @@ export default function TransitMap({
 
       {routes.map((route) =>
         route.stops.map((stop) => {
-          if (activeLegs && !activeStops.has(`${stop.lat},${stop.lng}`)) return null;
+          if (activeLegs && !activeStops.has(stop.id)) return null;
 
           return (
             <Marker key={`${route.id}-${stop.id}`} position={[stop.lat, stop.lng]} icon={defaultStopIcon}>

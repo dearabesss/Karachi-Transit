@@ -70,42 +70,6 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       ]
     },
     {
-      id: "orange-line-brt",
-      name: "Orangi Town to Board Office",
-      service: "Orange Line BRT",
-      colorHex: "#ea580c",
-      badgeBg: "bg-orange-600",
-      badgeText: "text-white",
-      baseFare: 30,
-      fareRule: "Flat Rs. 30",
-      stops: [
-        { id: "ol-1", name: "TMA Office Orangi", lat: 24.9450, lng: 67.0010 },
-        { id: "ol-2", name: "Faiz Fazaia", lat: 24.9400, lng: 67.0090 },
-        { id: "ol-3", name: "Jinnah University", lat: 24.9350, lng: 67.0180 },
-        { id: "ol-4", name: "Board Office", lat: 24.9298, lng: 67.0345 } 
-      ]
-    },
-    {
-      id: "pink-r1",
-      name: "Pink Route 1 (Women Only)",
-      service: "Pink Bus (Women)",
-      colorHex: "#db2777",
-      badgeBg: "bg-pink-600",
-      badgeText: "text-white",
-      baseFare: 50,
-      fareRule: "Flat Rs. 50 (Women Only)",
-      stops: [
-        { id: "pr1-1", name: "Model Colony", lat: 24.8978, lng: 67.1895 },
-        { id: "pr1-2", name: "Star Gate", lat: 24.8841, lng: 67.1554 },
-        { id: "pr1-3", name: "Karsaz", lat: 24.8721, lng: 67.0876 },
-        { id: "pr1-4", name: "Nursery", lat: 24.8680, lng: 67.0750 },
-        { id: "pr1-5", name: "FTC (Baloch Colony)", lat: 24.8624, lng: 67.0612 },
-        { id: "pr1-6", name: "Metropole Hotel", lat: 24.8528, lng: 67.0298 },
-        { id: "pr1-7", name: "Arts Council", lat: 24.8542, lng: 67.0195 },
-        { id: "pr1-8", name: "Merewether Tower", lat: 24.8485, lng: 66.9998 }
-      ]
-    },
-    {
       id: "pbs-r1",
       name: "Route 1 (Model Colony to Dockyard)",
       service: "Peoples Bus (Red)",
@@ -177,29 +141,13 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       fareRule: "Flat Rs. 30",
       stops: [
         { id: "ir-1", name: "Saddar", lat: 33.5939, lng: 73.0538 },
-        { id: "ir-2", name: "Marrir Chowk", lat: 33.5980, lng: 73.0570 },
-        { id: "ir-3", name: "Liaquat Bagh", lat: 33.6050, lng: 73.0640 },
-        { id: "ir-4", name: "Committee Chowk", lat: 33.6120, lng: 73.0670 },
-        { id: "ir-5", name: "Waris Khan", lat: 33.6180, lng: 73.0700 },
-        { id: "ir-6", name: "Chandni Chowk", lat: 33.6300, lng: 73.0730 },
-        { id: "ir-7", name: "Rehmanabad", lat: 33.6360, lng: 73.0760 },
-        { id: "ir-8", name: "6th Road", lat: 33.6420, lng: 73.0780 },
-        { id: "ir-9", name: "Shamsabad (Arid University)", lat: 33.6520, lng: 73.0800 },
-        { id: "ir-10", name: "Faizabad", lat: 33.6610, lng: 73.0800 },
-        { id: "ir-11", name: "IJP Road", lat: 33.6650, lng: 73.0700 },
-        { id: "ir-12", name: "Potohar", lat: 33.6680, lng: 73.0650 },
-        { id: "ir-13", name: "Khayaban-e-Johar", lat: 33.6710, lng: 73.0600 },
-        { id: "ir-14", name: "Faiz Ahmed Faiz", lat: 33.6750, lng: 73.0550 },
-        { id: "ir-15", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
-        { id: "ir-16", name: "Chaman", lat: 33.6940, lng: 73.0470 },
-        { id: "ir-17", name: "Ibn-e-Sina", lat: 33.6980, lng: 73.0480 },
-        { id: "ir-18", name: "Katchery", lat: 33.7010, lng: 73.0490 },
-        { id: "ir-19", name: "PIMS", lat: 33.7050, lng: 73.0500 },
-        { id: "ir-20", name: "Stock Exchange", lat: 33.7080, lng: 73.0550 },
-        { id: "ir-21", name: "7th Avenue", lat: 33.7120, lng: 73.0650 },
-        { id: "ir-22", name: "Shaheed-e-Millat", lat: 33.7160, lng: 73.0750 },
-        { id: "ir-23", name: "Parade Ground", lat: 33.7190, lng: 73.0850 },
-        { id: "ir-24", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
+        { id: "ir-2", name: "Liaquat Bagh", lat: 33.6050, lng: 73.0640 },
+        { id: "ir-4", name: "Chandni Chowk", lat: 33.6300, lng: 73.0730 },
+        { id: "ir-6", name: "Faizabad", lat: 33.6610, lng: 73.0800 },
+        { id: "ir-7", name: "IJP", lat: 33.6650, lng: 73.0700 },
+        { id: "ir-9", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
+        { id: "ir-10", name: "PIMS", lat: 33.7050, lng: 73.0500 },
+        { id: "ir-13", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
       ]
     },
     {
@@ -215,8 +163,6 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
         { id: "io-1", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
         { id: "io-2", name: "G-10 Station", lat: 33.6700, lng: 73.0150 },
         { id: "io-3", name: "NUST", lat: 33.6450, lng: 72.9900 },
-        { id: "io-4", name: "G-13", lat: 33.6350, lng: 72.9750 },
-        { id: "io-5", name: "N-5 Interchange", lat: 33.6150, lng: 72.9250 },
         { id: "io-6", name: "Islamabad International Airport", lat: 33.5550, lng: 72.8250 }
       ]
     }
@@ -297,21 +243,16 @@ export interface RouteLeg {
   fare?: number;
 }
 
-// STRICTLY TYPED: Origin and Destination are always BusStop objects
 export function findFastestRoute(
   origin: BusStop,
   destination: BusStop,
-  cityRoutes: TransitRoute[],
-  includeWomenOnly: boolean = false
+  cityRoutes: TransitRoute[]
 ): { legs: RouteLeg[]; totalTime: number; totalFare: number; totalDistance: number } | null {
   
   const nodes: GraphNode[] = [];
   const adjacencyList = new Map<string, { target: string; time: number; type: "RIDE" | "WALK"; dist: number }[]>();
 
   cityRoutes.forEach((route) => {
-    // FILTER OUT Pink Buses if toggle is off
-    if (route.service.includes("Women") && !includeWomenOnly) return;
-
     for (let i = 0; i < route.stops.length; i++) {
       const stop = route.stops[i];
       const uniqueId = `${route.id}-${stop.id}`;
@@ -340,9 +281,8 @@ export function findFastestRoute(
     for (let j = 0; j < nodes.length; j++) {
       if (i !== j && nodes[i].route.id !== nodes[j].route.id) {
         const dist = getDistanceKm(nodes[i].stop.lat, nodes[i].stop.lng, nodes[j].stop.lat, nodes[j].stop.lng);
-        // THRESHOLD SET TO 2.5KM TO ALLOW MAJOR CITY TRANSFERS
-        if (dist <= 2.5) {
-          const walkTime = (dist / 4.5) * 60 + 6; // Includes 6 mins transfer penalty
+        if (dist <= 0.85) {
+          const walkTime = (dist / 4.5) * 60 + 6;
           adjacencyList.get(nodes[i].uniqueId)!.push({ target: nodes[j].uniqueId, time: walkTime, type: "WALK", dist });
         }
       }
@@ -439,11 +379,8 @@ export function findFastestRoute(
     } else {
       if (!currentLeg || currentLeg.route?.id !== fromNode.route.id) {
         if (currentLeg) legs.push(currentLeg);
-        
         let initialFare = fromNode.route.baseFare;
-        // Fare exceptions
         if (fromNode.route.id === "green-line") initialFare = 40;
-        
         totalFare += initialFare;
         
         const speed = fromNode.route.service.includes("Train") ? 45 : fromNode.route.service.includes("BRT") || fromNode.route.service.includes("Line") ? 35 : 22;

@@ -165,7 +165,8 @@ twin_cities: [
         { id: "ir-23", name: "Parade Ground", lat: 33.7190, lng: 73.0850 },
         { id: "ir-24", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
       ]
-    },
+    }
+  },
     {
       id: "isb-orange",
       name: "Airport Route",

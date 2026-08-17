@@ -210,12 +210,8 @@ export interface GraphNode {
 export interface RouteLeg {
   type: "RIDE" | "WALK";
   route?: TransitRoute;
-  startName: string;
-  endName: string;
-  startLat: number;
-  startLng: number;
-  endLat: number;
-  endLng: number;
+  startStop: BusStop;
+  endStop: BusStop;
   distanceKm: number;
   timeMins: number;
   stopsPassed?: number;
@@ -223,43 +219,11 @@ export interface RouteLeg {
 }
 
 export function findFastestRoute(
-  originRaw: BusStop | [number, number],
-  destRaw: BusStop | [number, number],
+  origin: BusStop,
+  destination: BusStop,
   cityRoutes: TransitRoute[]
 ): { legs: RouteLeg[]; totalTime: number; totalFare: number; totalDistance: number } | null {
   
-  let originStop: BusStop;
-  let firstMileWalk = 0;
-  if (Array.isArray(originRaw)) {
-    let closest: BusStop | null = null;
-    let minD = Infinity;
-    cityRoutes.forEach(r => r.stops.forEach(s => {
-      const d = getDistanceKm(originRaw[0], originRaw[1], s.lat, s.lng);
-      if (d < minD) { minD = d; closest = s; }
-    }));
-    if (!closest) return null;
-    originStop = closest;
-    firstMileWalk = minD;
-  } else {
-    originStop = originRaw;
-  }
-
-  let destStop: BusStop;
-  let lastMileWalk = 0;
-  if (Array.isArray(destRaw)) {
-    let closest: BusStop | null = null;
-    let minD = Infinity;
-    cityRoutes.forEach(r => r.stops.forEach(s => {
-      const d = getDistanceKm(destRaw[0], destRaw[1], s.lat, s.lng);
-      if (d < minD) { minD = d; closest = s; }
-    }));
-    if (!closest) return null;
-    destStop = closest;
-    lastMileWalk = minD;
-  } else {
-    destStop = destRaw;
-  }
-
   const nodes: GraphNode[] = [];
   const adjacencyList = new Map<string, { target: string; time: number; type: "RIDE" | "WALK"; dist: number }[]>();
 
@@ -310,8 +274,8 @@ export function findFastestRoute(
     unvisited.add(n.uniqueId);
   });
 
-  const startNodes = nodes.filter((n) => n.stop.name === originStop.name);
-  const endNodes = nodes.filter((n) => n.stop.name === destStop.name);
+  const startNodes = nodes.filter((n) => n.stop.name === origin.name);
+  const endNodes = nodes.filter((n) => n.stop.name === destination.name);
 
   if (startNodes.length === 0 || endNodes.length === 0) return null;
 
@@ -379,10 +343,8 @@ export function findFastestRoute(
         const timeWalk = Math.max(2, Math.round((transition.dist / 4.5) * 60));
         legs.push({
           type: "WALK",
-          startName: fromNode.stop.name,
-          endName: toNode.stop.name,
-          startLat: fromNode.stop.lat, startLng: fromNode.stop.lng,
-          endLat: toNode.stop.lat, endLng: toNode.stop.lng,
+          startStop: fromNode.stop,
+          endStop: toNode.stop,
           distanceKm: transition.dist,
           timeMins: timeWalk,
         });
@@ -400,10 +362,8 @@ export function findFastestRoute(
         currentLeg = {
           type: "RIDE",
           route: fromNode.route,
-          startName: fromNode.stop.name,
-          endName: toNode.stop.name,
-          startLat: fromNode.stop.lat, startLng: fromNode.stop.lng,
-          endLat: toNode.stop.lat, endLng: toNode.stop.lng,
+          startStop: fromNode.stop,
+          endStop: toNode.stop,
           distanceKm: transition.dist,
           timeMins: timeRide,
           stopsPassed: 1,
@@ -411,9 +371,7 @@ export function findFastestRoute(
         };
         totalTime += timeRide;
       } else {
-        currentLeg.endName = toNode.stop.name;
-        currentLeg.endLat = toNode.stop.lat;
-        currentLeg.endLng = toNode.stop.lng;
+        currentLeg.endStop = toNode.stop;
         currentLeg.distanceKm += transition.dist;
         const speed = currentLeg.route?.service.includes("BRT") || currentLeg.route?.service.includes("Line") ? 35 : 22;
         const timeRide = (transition.dist / speed) * 60;
@@ -424,36 +382,6 @@ export function findFastestRoute(
     }
   }
   if (currentLeg) legs.push(currentLeg);
-
-  if (Array.isArray(originRaw) && firstMileWalk > 0.1) {
-    const timeWalk = Math.round((firstMileWalk / 4.5) * 60);
-    legs.unshift({
-      type: "WALK",
-      startName: "Dropped Pin (Origin)",
-      endName: originStop.name,
-      startLat: originRaw[0], startLng: originRaw[1],
-      endLat: originStop.lat, endLng: originStop.lng,
-      distanceKm: firstMileWalk,
-      timeMins: timeWalk
-    });
-    totalTime += timeWalk;
-    totalDistance += firstMileWalk;
-  }
-
-  if (Array.isArray(destRaw) && lastMileWalk > 0.1) {
-    const timeWalk = Math.round((lastMileWalk / 4.5) * 60);
-    legs.push({
-      type: "WALK",
-      startName: destStop.name,
-      endName: "Dropped Pin (Destination)",
-      startLat: destStop.lat, startLng: destStop.lng,
-      endLat: destRaw[0], endLng: destRaw[1],
-      distanceKm: lastMileWalk,
-      timeMins: timeWalk
-    });
-    totalTime += timeWalk;
-    totalDistance += lastMileWalk;
-  }
 
   legs.forEach((leg) => {
     if (leg.type === "RIDE" && leg.route?.service === "Peoples Bus (Red)" && leg.distanceKm > 15) {

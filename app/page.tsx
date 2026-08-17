@@ -178,7 +178,6 @@ export default function NationalTransitApp() {
             <>
               <div className="space-y-3">
                 
-                {/* Auto GPS Button - New Feature */}
                 <button 
                   onClick={handleGetLocationAndSetOrigin}
                   className="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors"
@@ -331,6 +330,7 @@ export default function NationalTransitApp() {
         />
       </main>
 
+      {/* FIXED: Passed activeRoutes to the Modal */}
       <ReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}

@@ -277,11 +277,12 @@ export function findFastestRoute(
     }
   });
 
-  for (let i = 0; i < nodes.length; i++) {
+for (let i = 0; i < nodes.length; i++) {
     for (let j = 0; j < nodes.length; j++) {
       if (i !== j && nodes[i].route.id !== nodes[j].route.id) {
         const dist = getDistanceKm(nodes[i].stop.lat, nodes[i].stop.lng, nodes[j].stop.lat, nodes[j].stop.lng);
-        if (dist <= 0.85) {
+        // FIX: Increase this threshold from 0.85 to 2.5
+        if (dist <= 2.5) {
           const walkTime = (dist / 4.5) * 60 + 6;
           adjacencyList.get(nodes[i].uniqueId)!.push({ target: nodes[j].uniqueId, time: walkTime, type: "WALK", dist });
         }

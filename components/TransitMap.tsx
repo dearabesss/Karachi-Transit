@@ -3,128 +3,176 @@
 import React, { useEffect } from "react";
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import { TransitRoute, BusStop } from "@/data/transitData";
+import { TransitRoute, BusStop, RouteLeg } from "@/data/transitData";
 
-// Fix Leaflet marker icons in Next.js
-const defaultIcon = L.icon({
+const defaultStopIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  iconSize: [22, 36],
+  iconAnchor: [11, 36],
+  popupAnchor: [0, -32],
+  shadowSize: [36, 36],
 });
 
-const userLocationIcon = L.divIcon({
-  className: "custom-user-icon",
-  html: `<div style="background-color: #0284c7; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 2px #0284c7;"></div>`,
+const userPinIcon = L.divIcon({
+  className: "user-loc-pin",
+  html: `<div style="background-color: #2563eb; width: 16px; height: 16px; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #2563eb;"></div>`,
   iconSize: [16, 16],
-  iconAnchor: [8, 8]
+  iconAnchor: [8, 8],
 });
 
-function MapRecenter({ center }: { center: [number, number] }) {
+function MapViewController({
+  center,
+  zoom,
+}: {
+  center: [number, number];
+  zoom?: number;
+}) {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
+    map.flyTo(center, zoom || map.getZoom(), { duration: 0.8 });
+  }, [center, zoom, map]);
   return null;
 }
 
 interface TransitMapProps {
   routes: TransitRoute[];
-  selectedRoute: TransitRoute | null;
+  activeLegs: RouteLeg[] | null;
   userCoords: [number, number] | null;
   nearestStop: BusStop | null;
-  onSelectStop: (stop: BusStop, route: TransitRoute) => void;
+  onSelectAsOrigin: (stop: BusStop) => void;
+  onSelectAsDestination: (stop: BusStop) => void;
 }
 
 export default function TransitMap({
   routes,
-  selectedRoute,
+  activeLegs,
   userCoords,
   nearestStop,
-  onSelectStop,
+  onSelectAsOrigin,
+  onSelectAsDestination,
 }: TransitMapProps) {
-  const defaultCenter: [number, number] = userCoords || [24.8934, 67.0822]; // Karachi Center
+  const centerPos: [number, number] = nearestStop
+    ? [nearestStop.lat, nearestStop.lng]
+    : userCoords || [24.8934, 67.0822];
 
   return (
-    <MapContainer
-      center={defaultCenter}
-      zoom={12}
-      scrollWheelZoom={true}
-      className="w-full h-full z-0"
-    >
+    <MapContainer center={centerPos} zoom={12} scrollWheelZoom={true} className="w-full h-full">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <MapRecenter center={nearestStop ? [nearestStop.lat, nearestStop.lng] : defaultCenter} />
+      <MapViewController center={centerPos} />
 
-      {/* User Location Marker */}
+      {/* User GPS Pin */}
       {userCoords && (
-        <Marker position={userCoords} icon={userLocationIcon}>
+        <Marker position={userCoords} icon={userPinIcon}>
           <Popup>
-            <div className="font-sans text-xs">
-              <strong className="text-slate-900 block font-bold">Your Location</strong>
-              <span className="text-slate-500">Nearest transit search origin</span>
+            <div className="p-1 font-sans text-xs">
+              <strong className="block text-slate-900 font-bold">Your Location</strong>
+              <span className="text-slate-500">Live GPS Coordinates</span>
             </div>
           </Popup>
         </Marker>
       )}
 
-      {/* Render Route Paths */}
+      {/* Default Bus Route Lines */}
       {routes.map((route) => {
-        const isSelected = selectedRoute ? selectedRoute.id === route.id : true;
+        const coords: [number, number][] = route.stops.map((s) => [s.lat, s.lng]);
         return (
           <Polyline
             key={route.id}
-            positions={route.path}
+            positions={coords}
             pathOptions={{
               color: route.colorHex,
-              weight: isSelected ? 5 : 2,
-              opacity: isSelected ? 0.9 : 0.35,
+              weight: activeLegs ? 2 : 4,
+              opacity: activeLegs ? 0.3 : 0.85,
             }}
           />
         );
       })}
 
-      {/* Render Bus Stops */}
-      {routes.map((route) =>
-        route.stops.map((stop) => {
-          const isSelected = selectedRoute ? selectedRoute.id === route.id : true;
-          const isNearest = nearestStop?.id === stop.id;
-
-          if (!isSelected && !isNearest) return null;
-
+      {/* Active High-Contrast Navigation Journey Overlay */}
+      {activeLegs &&
+        activeLegs.map((leg, idx) => {
+          if (leg.type === "WALK") {
+            return (
+              <Polyline
+                key={`leg-walk-${idx}`}
+                positions={[
+                  [leg.startStop.lat, leg.startStop.lng],
+                  [leg.endStop.lat, leg.endStop.lng],
+                ]}
+                pathOptions={{
+                  color: "#475569",
+                  weight: 4,
+                  dashArray: "6, 8",
+                  opacity: 0.9,
+                }}
+              />
+            );
+          }
           return (
-            <Marker
-              key={`${route.id}-${stop.id}`}
-              position={[stop.lat, stop.lng]}
-              icon={defaultIcon}
-              eventHandlers={{
-                click: () => onSelectStop(stop, route),
+            <Polyline
+              key={`leg-ride-${idx}`}
+              positions={[
+                [leg.startStop.lat, leg.startStop.lng],
+                [leg.endStop.lat, leg.endStop.lng],
+              ]}
+              pathOptions={{
+                color: leg.route?.colorHex || "#0f172a",
+                weight: 7,
+                opacity: 1,
               }}
-            >
-              <Popup>
-                <div className="font-sans text-xs p-1">
-                  <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold text-white rounded mb-1" style={{ backgroundColor: route.colorHex }}>
-                    {route.service}
-                  </span>
-                  <p className="font-bold text-slate-900 text-sm">{stop.name}</p>
-                  <p className="text-slate-500 mt-1">{route.fareRule}</p>
+            />
+          );
+        })}
+
+      {/* Stop Markers */}
+      {routes.map((route) =>
+        route.stops.map((stop) => (
+          <Marker
+            key={`${route.id}-${stop.id}`}
+            position={[stop.lat, stop.lng]}
+            icon={defaultStopIcon}
+          >
+            <Popup>
+              <div className="p-1.5 font-sans min-w-[180px]">
+                <span
+                  className="inline-block px-1.5 py-0.5 text-[10px] font-bold text-white rounded mb-1"
+                  style={{ backgroundColor: route.colorHex }}
+                >
+                  {route.service}
+                </span>
+                <p className="font-bold text-slate-900 text-sm">{stop.name}</p>
+                <p className="text-slate-500 text-[11px] mb-2">{route.fareRule}</p>
+                
+                <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-slate-100">
                   <button
-                    onClick={() => onSelectStop(stop, route)}
-                    className="mt-2 w-full bg-slate-900 text-white text-[11px] py-1 px-2 rounded font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectAsOrigin(stop);
+                    }}
+                    className="bg-emerald-700 text-white text-[10px] font-semibold py-1 rounded hover:bg-emerald-800 text-center"
                   >
-                    Select This Stop
+                    Set Origin
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectAsDestination(stop);
+                    }}
+                    className="bg-slate-900 text-white text-[10px] font-semibold py-1 rounded hover:bg-slate-800 text-center"
+                  >
+                    Set Dest
                   </button>
                 </div>
-              </Popup>
-            </Marker>
-          );
-        })
+              </div>
+            </Popup>
+          </Marker>
+        ))
       )}
     </MapContainer>
   );

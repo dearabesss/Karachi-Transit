@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Karachi Transit Guide & Live Reports",
-  description: "Official bus routes, fare calculator, nearest stop finder, and crowdsourced delay updates for Karachi.",
+  title: "Karachi Transit Guide & Live Navigation",
+  description: "Accurate Karachi Bus Route Planner, Fare Calculation, Station Finding, and Real-Time Delay Reporting.",
 };
 
 export default function RootLayout({

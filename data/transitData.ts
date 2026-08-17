@@ -129,7 +129,7 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
       ]
     }
   ],
-twin_cities: [
+  twin_cities: [
     {
       id: "isb-red",
       name: "Rawalpindi - Islamabad Metrobus",
@@ -165,8 +165,7 @@ twin_cities: [
         { id: "ir-23", name: "Parade Ground", lat: 33.7190, lng: 73.0850 },
         { id: "ir-24", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
       ]
-    }
-  },
+    },
     {
       id: "isb-orange",
       name: "Airport Route",
@@ -182,23 +181,6 @@ twin_cities: [
         { id: "io-3", name: "NUST", lat: 33.6450, lng: 72.9900 },
         { id: "io-4", name: "G-13", lat: 33.6350, lng: 72.9750 },
         { id: "io-5", name: "N-5 Interchange", lat: 33.6150, lng: 72.9250 },
-        { id: "io-6", name: "Islamabad International Airport", lat: 33.5550, lng: 72.8250 }
-      ]
-    }
-  ],
-    {
-      id: "isb-orange",
-      name: "Airport Route",
-      service: "Orange Line",
-      colorHex: "#ea580c",
-      badgeBg: "bg-orange-600",
-      badgeText: "text-white",
-      baseFare: 50,
-      fareRule: "Flat Rs. 50",
-      stops: [
-        { id: "io-1", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
-        { id: "io-2", name: "G-10 Station", lat: 33.6700, lng: 73.0150 },
-        { id: "io-3", name: "NUST", lat: 33.6450, lng: 72.9900 },
         { id: "io-6", name: "Islamabad International Airport", lat: 33.5550, lng: 72.8250 }
       ]
     }
@@ -313,11 +295,10 @@ export function findFastestRoute(
     }
   });
 
- for (let i = 0; i < nodes.length; i++) {
+  for (let i = 0; i < nodes.length; i++) {
     for (let j = 0; j < nodes.length; j++) {
       if (i !== j && nodes[i].route.id !== nodes[j].route.id) {
         const dist = getDistanceKm(nodes[i].stop.lat, nodes[i].stop.lng, nodes[j].stop.lat, nodes[j].stop.lng);
-        // FIX: Increase this threshold from 0.85 to 2.5
         if (dist <= 2.5) {
           const walkTime = (dist / 4.5) * 60 + 6;
           adjacencyList.get(nodes[i].uniqueId)!.push({ target: nodes[j].uniqueId, time: walkTime, type: "WALK", dist });

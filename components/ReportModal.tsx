@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { TRANSIT_ROUTES, DelayReport } from "@/data/transitData";
-import { AlertTriangle, X, Send } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -69,27 +69,27 @@ export default function ReportModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 z-[3000] flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-300 rounded-lg max-w-md w-full p-5 shadow-2xl space-y-4">
-        <div className="flex justify-between items-center border-b border-slate-200 pb-3">
-          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-600" />
-            {isUrdu ? "بس تاخیر یا مسئلے کی اطلاع دیں" : "Report Bus Delay or Issue"}
+    <div className="fixed inset-0 bg-slate-900/70 z-[3000] flex items-center justify-center p-4">
+      <div className="bg-white border-2 border-slate-300 rounded-xl max-w-lg w-full p-6 shadow-2xl">
+        <div className="flex justify-between items-center border-b border-slate-200 pb-4 mb-4">
+          <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+            <AlertTriangle className="w-6 h-6 text-red-600" />
+            {isUrdu ? "بس تاخیر کی اطلاع دیں" : "Report Bus Delay or Issue"}
           </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <X className="w-4 h-4" />
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-900 p-1">
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-sm font-bold text-slate-700 mb-2">
               {isUrdu ? "بس سروس منتخب کریں" : "Select Route"}
             </label>
             <select
               value={routeId}
               onChange={(e) => setRouteId(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              className="w-full border-2 border-slate-300 rounded-lg px-4 py-3 text-base text-slate-900 focus:outline-none focus:border-slate-900"
             >
               {TRANSIT_ROUTES.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -100,7 +100,7 @@ export default function ReportModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-sm font-bold text-slate-700 mb-2">
               {isUrdu ? "اسٹاپ کا نام / مقام" : "Stop / Landmark"}
             </label>
             <input
@@ -108,19 +108,19 @@ export default function ReportModal({
               required
               value={stopName}
               onChange={(e) => setStopName(e.target.value)}
-              placeholder="e.g. Numaish, Karsaz, Safoora Chowrangi"
-              className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              placeholder="e.g. Numaish, Karsaz"
+              className="w-full border-2 border-slate-300 rounded-lg px-4 py-3 text-base text-slate-900 focus:outline-none focus:border-slate-900"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-sm font-bold text-slate-700 mb-2">
               {isUrdu ? "مسئلے کی قسم" : "Issue Type"}
             </label>
             <select
               value={issueType}
               onChange={(e) => setIssueType(e.target.value as DelayReport["issueType"])}
-              className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              className="w-full border-2 border-slate-300 rounded-lg px-4 py-3 text-base text-slate-900 focus:outline-none focus:border-slate-900"
             >
               <option value="Delay">{isUrdu ? "شدید تاخیر" : "Severe Delay"}</option>
               <option value="Heavy Traffic">{isUrdu ? "ٹریفک جام" : "Heavy Traffic Jam"}</option>
@@ -131,33 +131,32 @@ export default function ReportModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-sm font-bold text-slate-700 mb-2">
               {isUrdu ? "تفصیلات (اختیاری)" : "Details (Optional)"}
             </label>
             <textarea
-              rows={2}
+              rows={3}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder={isUrdu ? "مثال: بس ۲۰ منٹ سے نہیں آئی..." : "e.g. 20 min headway delay, road diversion..."}
-              className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              placeholder={isUrdu ? "یہاں تفصیل لکھیں..." : "Provide any extra details here..."}
+              className="w-full border-2 border-slate-300 rounded-lg px-4 py-3 text-base text-slate-900 focus:outline-none focus:border-slate-900"
             />
           </div>
 
-          <div className="flex gap-2 pt-2">
+          <div className="flex gap-4 pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-slate-100 text-slate-700 text-xs py-2 rounded font-medium hover:bg-slate-200"
+              className="flex-1 bg-slate-100 text-slate-900 text-base font-bold py-4 rounded-lg hover:bg-slate-200 transition-colors"
             >
               {isUrdu ? "منسوخ" : "Cancel"}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-slate-900 text-white text-xs py-2 rounded font-medium hover:bg-slate-800 flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="flex-1 bg-slate-900 text-white text-base font-bold py-4 rounded-lg hover:bg-slate-800 disabled:opacity-50 transition-colors"
             >
-              <Send className="w-3 h-3" />
-              {isSubmitting ? (isUrdu ? "ارسال ہو رہا ہے..." : "Submitting...") : isUrdu ? "رپورٹ بھیجیں" : "Submit Alert"}
+              {isSubmitting ? (isUrdu ? "رپورٹ بھیجی جا رہی ہے..." : "Submitting...") : isUrdu ? "رپورٹ جمع کریں" : "Submit Report"}
             </button>
           </div>
         </form>

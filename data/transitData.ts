@@ -154,7 +154,7 @@ export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
         { id: "ir-12", name: "Potohar", lat: 33.6680, lng: 73.0650 },
         { id: "ir-13", name: "Khayaban-e-Johar", lat: 33.6710, lng: 73.0600 },
         { id: "ir-14", name: "Faiz Ahmed Faiz", lat: 33.6750, lng: 73.0550 },
-        { id: "ir-15", name: "Peshawar Morr (Kashmir Hwy)", lat: 33.6900, lng: 73.0450 },
+        { id: "ir-15", name: "Peshawar Morr", lat: 33.6900, lng: 73.0450 },
         { id: "ir-16", name: "Chaman", lat: 33.6940, lng: 73.0470 },
         { id: "ir-17", name: "Ibn-e-Sina", lat: 33.6980, lng: 73.0480 },
         { id: "ir-18", name: "Katchery", lat: 33.7010, lng: 73.0490 },

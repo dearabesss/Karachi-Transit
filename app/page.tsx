@@ -10,9 +10,10 @@ import {
   BusStop,
   DelayReport,
   findFastestRoute,
+  getDistanceKm,
 } from "@/data/transitData";
 import ReportModal from "@/components/ReportModal";
-import { Navigation, AlertTriangle, Clock, Languages, Map as MapIcon, Footprints, Bus, CheckCircle2, MapPin } from "lucide-react";
+import { Navigation, AlertTriangle, Clock, Languages, Map as MapIcon, MapPin } from "lucide-react";
 
 const TransitMap = dynamic(() => import("@/components/TransitMap"), {
   ssr: false,
@@ -28,13 +29,9 @@ export default function NationalTransitApp() {
   const [selectedCityId, setSelectedCityId] = useState<CityId>("karachi");
   const [activeTab, setActiveTab] = useState<"plan" | "reports">("plan");
   
-  const [selectedOriginType, setSelectedOriginType] = useState<"stop" | "custom" | null>(null);
-  const [selectedOriginStop, setSelectedOriginStop] = useState<BusStop | null>(null);
-  const [customOriginCoords, setCustomOriginCoords] = useState<[number, number] | null>(null);
-
-  const [selectedDestType, setSelectedDestType] = useState<"stop" | "custom" | null>(null);
-  const [selectedDestStop, setSelectedDestStop] = useState<BusStop | null>(null);
-  const [customDestCoords, setCustomDestCoords] = useState<[number, number] | null>(null);
+  const [selectedOrigin, setSelectedOrigin] = useState<BusStop | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<BusStop | null>(null);
+  const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
 
   const [hoveredLegIndex, setHoveredLegIndex] = useState<number | null>(null);
   const [reports, setReports] = useState<DelayReport[]>(INITIAL_REPORTS);
@@ -56,10 +53,9 @@ export default function NationalTransitApp() {
 
   const handleCityChange = (newCityId: CityId) => {
     setSelectedCityId(newCityId);
-    setSelectedOriginType(null);
-    setSelectedDestType(null);
-    setCustomOriginCoords(null);
-    setCustomDestCoords(null);
+    setSelectedOrigin(null);
+    setSelectedDestination(null);
+    setUserCoords(null);
   };
 
   const allStops = useMemo(() => {
@@ -68,28 +64,39 @@ export default function NationalTransitApp() {
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [activeRoutes]);
 
-  const handleMapClick = (lat: number, lng: number) => {
-    if (activeTab !== "plan") return;
-    if (!selectedOriginType) {
-      setSelectedOriginType("custom");
-      setCustomOriginCoords([lat, lng]);
-    } else if (!selectedDestType) {
-      setSelectedDestType("custom");
-      setCustomDestCoords([lat, lng]);
-    } else {
-      setSelectedOriginType("custom");
-      setCustomOriginCoords([lat, lng]);
-      setSelectedDestType(null);
-      setCustomDestCoords(null);
+  const handleGetLocationAndSetOrigin = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserCoords([lat, lng]);
+
+          let closest: BusStop | null = null;
+          let minDistance = Infinity;
+          activeRoutes.forEach((r) => {
+            r.stops.forEach((s) => {
+              const d = getDistanceKm(lat, lng, s.lat, s.lng);
+              if (d < minDistance) {
+                minDistance = d;
+                closest = s;
+              }
+            });
+          });
+          
+          if (closest) {
+             setSelectedOrigin(closest);
+          }
+        },
+        () => alert("Location access denied. Please select your stop manually.")
+      );
     }
   };
 
   const journeyData = useMemo(() => {
-    const originRaw = selectedOriginType === "custom" ? customOriginCoords : selectedOriginStop;
-    const destRaw = selectedDestType === "custom" ? customDestCoords : selectedDestStop;
-    if (!originRaw || !destRaw) return null;
-    return findFastestRoute(originRaw, destRaw, activeRoutes);
-  }, [selectedOriginType, customOriginCoords, selectedOriginStop, selectedDestType, customDestCoords, selectedDestStop, activeRoutes]);
+    if (!selectedOrigin || !selectedDestination || selectedOrigin.name === selectedDestination.name) return null;
+    return findFastestRoute(selectedOrigin, selectedDestination, activeRoutes);
+  }, [selectedOrigin, selectedDestination, activeRoutes]);
 
   return (
     <div className="flex flex-col h-screen bg-white md:flex-row font-sans text-slate-900 overflow-hidden">
@@ -127,23 +134,22 @@ export default function NationalTransitApp() {
           {activeTab === "plan" ? (
             <>
               <div className="space-y-3">
-                <p className="text-xs text-slate-500 font-medium mb-4 bg-slate-100 p-2 rounded border border-slate-200">
-                  <span className="font-bold text-slate-700">Pro Tip:</span> Click anywhere on the map to drop a pin and calculate walking distance to the nearest station!
-                </p>
+                <button 
+                  onClick={handleGetLocationAndSetOrigin}
+                  className="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors"
+                >
+                  <Navigation className="w-4 h-4" />
+                  {isUrdu ? "قریبی اسٹاپ پر سنیپ کریں" : "Snap to Nearest Stop"}
+                </button>
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 uppercase mb-1.5 block">{isUrdu ? "روانگی" : "Origin"}</label>
                   <select
                     className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
-                    value={selectedOriginType === "custom" ? "custom" : selectedOriginStop?.name || ""}
-                    onChange={(e) => {
-                      if (e.target.value === "custom") return;
-                      setSelectedOriginType("stop");
-                      setSelectedOriginStop(allStops.find(s => s.name === e.target.value) || null);
-                    }}
+                    value={selectedOrigin?.name || ""}
+                    onChange={(e) => setSelectedOrigin(allStops.find(s => s.name === e.target.value) || null)}
                   >
                     <option value="">Select origin...</option>
-                    {selectedOriginType === "custom" && <option value="custom">📍 Dropped Pin (Map Click)</option>}
                     {allStops.map((s) => <option key={`o-${s.name}`} value={s.name}>{s.name}</option>)}
                   </select>
                 </div>
@@ -152,15 +158,10 @@ export default function NationalTransitApp() {
                   <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase">{isUrdu ? "منزل" : "Destination"}</label>
                   <select
                     className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
-                    value={selectedDestType === "custom" ? "custom" : selectedDestStop?.name || ""}
-                    onChange={(e) => {
-                      if (e.target.value === "custom") return;
-                      setSelectedDestType("stop");
-                      setSelectedDestStop(allStops.find(s => s.name === e.target.value) || null);
-                    }}
+                    value={selectedDestination?.name || ""}
+                    onChange={(e) => setSelectedDestination(allStops.find(s => s.name === e.target.value) || null)}
                   >
                     <option value="">Select destination...</option>
-                    {selectedDestType === "custom" && <option value="custom">📍 Dropped Pin (Map Click)</option>}
                     {allStops.map((s) => <option key={`d-${s.name}`} value={s.name}>{s.name}</option>)}
                   </select>
                 </div>
@@ -195,12 +196,12 @@ export default function NationalTransitApp() {
                         ></div>
                         
                         <h4 className="text-sm font-bold text-slate-900 leading-tight">
-                          {leg.type === "WALK" ? (isUrdu ? "پیدل" : "Walk") : leg.route?.name}
+                          {leg.type === "WALK" ? (isUrdu ? "پیدل / ٹرانسفر" : "Walk / Transfer") : leg.route?.name}
                         </h4>
                         
                         <div className="mt-1.5 space-y-0.5">
-                           <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "From:" : "Board:"}</span> {leg.startName}</p>
-                           <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "To:" : "Drop:"}</span> {leg.endName}</p>
+                           <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "From:" : "Board:"}</span> {leg.startStop.name}</p>
+                           <p className="text-xs text-slate-700"><span className="font-semibold text-slate-500">{leg.type === "WALK" ? "To:" : "Drop:"}</span> {leg.endStop.name}</p>
                         </div>
 
                         <div className="mt-1.5 text-[11px] font-semibold text-slate-500 flex gap-2.5">
@@ -220,7 +221,7 @@ export default function NationalTransitApp() {
                 <div className="bg-slate-50 border border-dashed border-slate-300 p-8 rounded text-center">
                   <MapPin className="w-6 h-6 text-slate-400 mx-auto mb-2" />
                   <p className="text-sm font-bold text-slate-600">Select Locations</p>
-                  <p className="text-xs text-slate-500 mt-1">Click the map or use the dropdowns to generate a route.</p>
+                  <p className="text-xs text-slate-500 mt-1">Select an origin and destination to generate a route.</p>
                 </div>
               )}
             </>
@@ -252,16 +253,14 @@ export default function NationalTransitApp() {
           routes={activeRoutes}
           activeLegs={journeyData ? journeyData.legs : null}
           hoveredLegIndex={hoveredLegIndex}
-          customOriginCoords={customOriginCoords}
-          customDestCoords={customDestCoords}
+          userCoords={userCoords}
           cityCenter={activeCityConfig.center}
-          onMapClick={handleMapClick}
-          onSelectAsOrigin={(s) => { setSelectedOriginType("stop"); setSelectedOriginStop(s); }}
-          onSelectAsDestination={(s) => { setSelectedDestType("stop"); setSelectedDestStop(s); }}
+          onSelectAsOrigin={(s) => setSelectedOrigin(s)}
+          onSelectAsDestination={(s) => setSelectedDestination(s)}
         />
       </main>
 
-      <ReportModal isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)} onSuccess={(newRep) => { setReports([newRep, ...reports]); setActiveTab("reports"); }} activeRoutes={activeRoutes} isUrdu={isUrdu} />
+      <ReportModal isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)} onSuccess={(newRep) => { setReports([newRep, ...reports]); setActiveTab("reports"); }} activeRoutes={activeRoutes} initialStopName={selectedOrigin ? selectedOrigin.name : ""} isUrdu={isUrdu} />
     </div>
   );
 }

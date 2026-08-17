@@ -63,7 +63,6 @@ export default function NationalTransitApp() {
   const allStops = useMemo(() => {
     const map = new Map<string, BusStop>();
     activeRoutes.forEach((r) => {
-      // Don't list Pink bus stops if filter is off
       if (r.service.includes("Women") && !includeWomenOnly) return;
       r.stops.forEach((s) => { if (!map.has(s.name)) map.set(s.name, s); });
     });
@@ -118,7 +117,6 @@ export default function NationalTransitApp() {
           cityCenter={activeCityConfig.center}
           onSelectAsOrigin={(s) => setSelectedOrigin(s)}
           onSelectAsDestination={(s) => setSelectedDestination(s)}
-          includeWomenOnly={includeWomenOnly}
         />
       </main>
 

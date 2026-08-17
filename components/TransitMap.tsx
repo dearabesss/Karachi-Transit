@@ -39,6 +39,7 @@ interface TransitMapProps {
   activeLegs: RouteLeg[] | null;
   userCoords: [number, number] | null;
   nearestStop: BusStop | null;
+  cityCenter: [number, number]; // NEW: Pass the city center
   onSelectAsOrigin: (stop: BusStop) => void;
   onSelectAsDestination: (stop: BusStop) => void;
 }
@@ -48,14 +49,16 @@ export default function TransitMap({
   activeLegs,
   userCoords,
   nearestStop,
+  cityCenter,
   onSelectAsOrigin,
   onSelectAsDestination,
 }: TransitMapProps) {
+  
+  // Center priorities: Nearest Stop > User GPS > City Default Center
   const centerPos: [number, number] = nearestStop
     ? [nearestStop.lat, nearestStop.lng]
-    : userCoords || [24.8934, 67.0822];
+    : userCoords || cityCenter;
 
-  // Calculate bounding box if active legs exist so the map automatically frames the journey
   let journeyBounds: L.LatLngBounds | undefined;
   if (activeLegs && activeLegs.length > 0) {
     const latLngs: [number, number][] = [];
@@ -66,7 +69,6 @@ export default function TransitMap({
     journeyBounds = L.latLngBounds(latLngs);
   }
 
-  // Identify stops involved in the active journey to hide the rest
   const activeStops = new Set<string>();
   if (activeLegs) {
     activeLegs.forEach(leg => {
@@ -76,7 +78,7 @@ export default function TransitMap({
   }
 
   return (
-    <MapContainer center={centerPos} zoom={12} scrollWheelZoom={true} className="w-full h-full">
+    <MapContainer center={cityCenter} zoom={12} scrollWheelZoom={true} className="w-full h-full">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -84,7 +86,6 @@ export default function TransitMap({
 
       <MapViewController center={centerPos} bounds={journeyBounds} />
 
-      {/* User GPS Pin */}
       {userCoords && (
         <Marker position={userCoords} icon={userPinIcon}>
           <Popup>
@@ -95,7 +96,6 @@ export default function TransitMap({
         </Marker>
       )}
 
-      {/* Default Bus Route Lines (ONLY SHOW IF NO ACTIVE JOURNEY) */}
       {!activeLegs && routes.map((route) => {
         const coords: [number, number][] = route.stops.map((s) => [s.lat, s.lng]);
         return (
@@ -111,7 +111,6 @@ export default function TransitMap({
         );
       })}
 
-      {/* Active High-Contrast Navigation Journey Overlay */}
       {activeLegs &&
         activeLegs.map((leg, idx) => {
           if (leg.type === "WALK") {
@@ -147,10 +146,8 @@ export default function TransitMap({
           );
         })}
 
-      {/* Stop Markers - Filtered if activeLegs is present */}
       {routes.map((route) =>
         route.stops.map((stop) => {
-          // If a journey is selected, only show markers for stops on that journey
           if (activeLegs && !activeStops.has(stop.id)) return null;
 
           return (

@@ -15,7 +15,6 @@ import {
 import ReportModal from "@/components/ReportModal";
 import {
   MapPin,
-  Footprints,
   Navigation,
   AlertTriangle,
   Clock,
@@ -52,7 +51,6 @@ export default function NationalTransitApp() {
       try {
         const res = await fetch("/api/reports");
         const data = await res.json();
-        // In a real database, filter reports by selectedCityId here
         if (data.reports) setReports(data.reports);
       } catch {
         // Fallback
@@ -61,7 +59,6 @@ export default function NationalTransitApp() {
     fetchReports();
   }, []);
 
-  // When city changes, reset trip data
   const handleCityChange = (newCityId: CityId) => {
     setSelectedCityId(newCityId);
     setSelectedOrigin(null);
@@ -79,7 +76,7 @@ export default function NationalTransitApp() {
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [activeRoutes]);
 
-  const handleGetLocation = () => {
+  const handleGetLocationAndSetOrigin = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -98,9 +95,12 @@ export default function NationalTransitApp() {
               }
             });
           });
-          if (closest) setSelectedOrigin(closest);
+          
+          if (closest) {
+             setSelectedOrigin(closest);
+          }
         },
-        () => alert("Location access denied.")
+        () => alert("Location access denied. Please select your stop manually.")
       );
     }
   };
@@ -109,14 +109,12 @@ export default function NationalTransitApp() {
     if (!selectedOrigin || !selectedDestination || selectedOrigin.name === selectedDestination.name) {
       return null;
     }
-    // Pass the activeRoutes (Specific City) to the Dijkstra engine
     return findFastestRoute(selectedOrigin, selectedDestination, activeRoutes);
   }, [selectedOrigin, selectedDestination, activeRoutes]);
 
   return (
     <div className="flex flex-col h-screen bg-white md:flex-row font-sans text-slate-900 overflow-hidden">
       
-      {/* COMPACT SIDEBAR PANEL */}
       <aside className="w-full md:w-[400px] bg-white border-r border-slate-300 flex flex-col z-20 shrink-0 h-[55%] md:h-full">
         
         <header className="px-5 py-3 bg-slate-900 text-white flex items-center justify-between shrink-0">
@@ -134,7 +132,6 @@ export default function NationalTransitApp() {
           </button>
         </header>
 
-        {/* CITY SELECTOR */}
         <div className="bg-slate-800 px-5 py-2.5 border-t border-slate-700 shrink-0 flex items-center gap-3">
            <MapIcon className="w-4 h-4 text-slate-400" />
            <select 
@@ -179,20 +176,21 @@ export default function NationalTransitApp() {
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
           {activeTab === "plan" ? (
             <>
-              {/* Tighter Form */}
               <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between items-end mb-1.5">
-                    <label className="text-xs font-bold text-slate-700 uppercase">
-                      {isUrdu ? "روانگی" : "Origin"}
-                    </label>
-                    <button
-                      onClick={handleGetLocation}
-                      className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                    >
-                      <Navigation className="w-3 h-3" /> GPS
-                    </button>
-                  </div>
+                
+                {/* Auto GPS Button - New Feature */}
+                <button 
+                  onClick={handleGetLocationAndSetOrigin}
+                  className="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2 rounded text-sm font-bold flex items-center justify-center gap-2 hover:bg-blue-100 transition-colors"
+                >
+                  <Navigation className="w-4 h-4" />
+                  {isUrdu ? "میری موجودہ لوکیشن استعمال کریں" : "Use My Current Location"}
+                </button>
+
+                <div className="pt-2">
+                  <label className="text-xs font-bold text-slate-700 uppercase mb-1.5 block">
+                    {isUrdu ? "روانگی" : "Origin"}
+                  </label>
                   <select
                     className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900 bg-white"
                     value={selectedOrigin?.name || ""}
@@ -323,11 +321,11 @@ export default function NationalTransitApp() {
 
       <main className="flex-1 bg-slate-200 relative z-10 h-[45%] md:h-full border-t md:border-t-0 md:border-l border-slate-300">
         <TransitMap
-          routes={activeRoutes} // Only pass routes for the selected city
+          routes={activeRoutes}
           activeLegs={journeyData ? journeyData.legs : null}
           userCoords={userCoords}
           nearestStop={null} 
-          cityCenter={activeCityConfig.center} // Pass the center so map flies there
+          cityCenter={activeCityConfig.center}
           onSelectAsOrigin={(s) => setSelectedOrigin(s)}
           onSelectAsDestination={(s) => setSelectedDestination(s)}
         />
@@ -340,6 +338,7 @@ export default function NationalTransitApp() {
           setReports([newRep, ...reports]);
           setActiveTab("reports");
         }}
+        activeRoutes={activeRoutes}
         initialStopName={selectedOrigin ? selectedOrigin.name : ""}
         isUrdu={isUrdu}
       />

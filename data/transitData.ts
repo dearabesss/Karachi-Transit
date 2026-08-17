@@ -344,6 +344,7 @@ export function findFastestRoute(
     current = prev ? prev.node : null;
   }
 
+// Parse path into human-readable legs
   const legs: RouteLeg[] = [];
   let currentLeg: RouteLeg | null = null;
   let totalFare = 0;
@@ -353,18 +354,25 @@ export function findFastestRoute(
     const fromNode = nodes.find((n) => n.uniqueId === rawPath[i])!;
     const toNode = nodes.find((n) => n.uniqueId === rawPath[i + 1])!;
     const transition = previous.get(toNode.uniqueId)!;
-    totalDistance += transition.dist;
+    
+    // Only add to total distance if it's an actual movement
+    if (transition.dist > 0.1) {
+       totalDistance += transition.dist;
+    }
 
     if (transition.type === "WALK") {
-      if (currentLeg) legs.push(currentLeg);
-      legs.push({
-        type: "WALK",
-        startStop: fromNode.stop,
-        endStop: toNode.stop,
-        distanceKm: transition.dist,
-        timeMins: Math.max(2, Math.round((transition.dist / 4.5) * 60)),
-      });
-      currentLeg = null;
+      // FIX: Ignore phantom walks at the exact same coordinates
+      if (transition.dist > 0.05) { 
+        if (currentLeg) legs.push(currentLeg);
+        legs.push({
+          type: "WALK",
+          startStop: fromNode.stop,
+          endStop: toNode.stop,
+          distanceKm: transition.dist,
+          timeMins: Math.max(2, Math.round((transition.dist / 4.5) * 60)),
+        });
+        currentLeg = null;
+      }
     } else {
       if (!currentLeg || currentLeg.route?.id !== fromNode.route.id) {
         if (currentLeg) legs.push(currentLeg);

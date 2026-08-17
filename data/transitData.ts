@@ -3,14 +3,12 @@ export interface BusStop {
   name: string;
   lat: number;
   lng: number;
-  routeId?: string;
-  distance?: number;
 }
 
 export interface TransitRoute {
   id: string;
   name: string;
-  service: "Green Line BRT" | "Peoples Bus (Red)" | "Peoples Bus (EV)" | "Pink Bus (Women)";
+  service: string;
   colorHex: string;
   badgeBg: string;
   badgeText: string;
@@ -29,154 +27,167 @@ export interface DelayReport {
   timestamp: string;
 }
 
-export const TRANSIT_ROUTES: TransitRoute[] = [
-  {
-    id: "green-line",
-    name: "Surjani Town to Numaish",
-    service: "Green Line BRT",
-    colorHex: "#047857",
-    badgeBg: "bg-emerald-700",
-    badgeText: "text-white",
-    baseFare: 55,
-    fareRule: "Rs. 15 to Rs. 55 distance slab",
-    stops: [
-      { id: "gl-1", name: "Surjani Town Terminal", lat: 25.0345, lng: 67.0642 },
-      { id: "gl-2", name: "4K Chowrangi", lat: 25.0116, lng: 67.0682 },
-      { id: "gl-3", name: "Do Minute Chowrangi", lat: 24.9965, lng: 67.0664 },
-      { id: "gl-4", name: "Power House Chowrangi", lat: 24.9818, lng: 67.0651 },
-      { id: "gl-5", name: "UP More", lat: 24.9750, lng: 67.0659 },
-      { id: "gl-6", name: "Nagan Chowrangi", lat: 24.9682, lng: 67.0667 },
-      { id: "gl-7", name: "Sakhi Hassan", lat: 24.9546, lng: 67.0632 },
-      { id: "gl-8", name: "Hyderi", lat: 24.9388, lng: 67.0435 },
-      { id: "gl-9", name: "Board Office", lat: 24.9298, lng: 67.0345 },
-      { id: "gl-10", name: "Nazimabad No. 1", lat: 24.9182, lng: 67.0312 },
-      { id: "gl-11", name: "Lasbela Chowk", lat: 24.8872, lng: 67.0295 },
-      { id: "gl-12", name: "Patel Para (Guru Mandir)", lat: 24.8775, lng: 67.0335 },
-      { id: "gl-13", name: "Numaish Chowrangi (BRT Station)", lat: 24.8719, lng: 67.0381 }
-    ]
-  },
-  {
-    id: "pbs-r1",
-    name: "Route 1 (Model Colony to Dockyard)",
-    service: "Peoples Bus (Red)",
-    colorHex: "#dc2626",
-    badgeBg: "bg-red-600",
-    badgeText: "text-white",
-    baseFare: 80,
-    fareRule: "Rs. 80 (<=15km), Rs. 120 (>15km)",
-    stops: [
-      { id: "r1-1", name: "Model Colony", lat: 24.8978, lng: 67.1895 },
-      { id: "r1-2", name: "Malir Halt", lat: 24.8894, lng: 67.1702 },
-      { id: "r1-3", name: "Colony Gate", lat: 24.8860, lng: 67.1620 },
-      { id: "r1-4", name: "Jinnah Airport Terminal 1", lat: 24.8821, lng: 67.1425 },
-      { id: "r1-5", name: "Drigh Road Station", lat: 24.8789, lng: 67.1192 },
-      { id: "r1-6", name: "PAF Base Faisal", lat: 24.8750, lng: 67.1050 },
-      { id: "r1-7", name: "Karsaz (Shahrah-e-Faisal)", lat: 24.8721, lng: 67.0876 },
-      { id: "r1-8", name: "Nursery", lat: 24.8680, lng: 67.0750 },
-      { id: "r1-9", name: "FTC (Baloch Colony)", lat: 24.8624, lng: 67.0612 },
-      { id: "r1-10", name: "Metropole Hotel", lat: 24.8528, lng: 67.0298 },
-      { id: "r1-11", name: "Arts Council", lat: 24.8542, lng: 67.0195 },
-      { id: "r1-12", name: "Merewether Tower", lat: 24.8485, lng: 66.9998 },
-      { id: "r1-13", name: "Dockyard", lat: 24.8420, lng: 66.9850 }
-    ]
-  },
-  {
-    id: "pbs-r2",
-    name: "Route 2 (North Karachi to Indus Hospital)",
-    service: "Peoples Bus (Red)",
-    colorHex: "#dc2626",
-    badgeBg: "bg-red-600",
-    badgeText: "text-white",
-    baseFare: 80,
-    fareRule: "Rs. 80 (<=15km), Rs. 120 (>15km)",
-    stops: [
-      { id: "r2-1", name: "North Karachi Sector 5", lat: 25.0020, lng: 67.0710 },
-      { id: "r2-2", name: "Nagan Chowrangi", lat: 24.9682, lng: 67.0667 },
-      { id: "r2-3", name: "Sohrab Goth", lat: 24.9450, lng: 67.0870 },
-      { id: "r2-4", name: "NIPA Chowrangi", lat: 24.9192, lng: 67.0984 },
-      { id: "r2-5", name: "Johar Mor", lat: 24.9150, lng: 67.1100 },
-      { id: "r2-6", name: "Drigh Road Station", lat: 24.8789, lng: 67.1192 },
-      { id: "r2-7", name: "Shah Faisal Colony", lat: 24.8700, lng: 67.1400 },
-      { id: "r2-8", name: "Singer Chowrangi", lat: 24.8450, lng: 67.1350 },
-      { id: "r2-9", name: "Indus Hospital Korangi", lat: 24.8250, lng: 67.1210 }
-    ]
-  },
-  {
-    id: "pbs-ev1",
-    name: "EV-1 (Malir Cantt to Dolmen Mall)",
-    service: "Peoples Bus (EV)",
-    colorHex: "#0284c7",
-    badgeBg: "bg-sky-700",
-    badgeText: "text-white",
-    baseFare: 100,
-    fareRule: "Flat Rs. 100",
-    stops: [
-      { id: "ev1-1", name: "CMH Malir Cantt", lat: 24.9450, lng: 67.1950 },
-      { id: "ev1-2", name: "Tank Chowk", lat: 24.9250, lng: 67.1900 },
-      { id: "ev1-3", name: "Model Colony", lat: 24.8978, lng: 67.1895 },
-      { id: "ev1-4", name: "Jinnah Airport Terminal 1", lat: 24.8821, lng: 67.1425 },
-      { id: "ev1-5", name: "Drigh Road Station", lat: 24.8789, lng: 67.1192 },
-      { id: "ev1-6", name: "Karsaz (Shahrah-e-Faisal)", lat: 24.8721, lng: 67.0876 },
-      { id: "ev1-7", name: "FTC (Baloch Colony)", lat: 24.8624, lng: 67.0612 },
-      { id: "ev1-8", name: "DHA Phase 1 (Korangi Rd)", lat: 24.8350, lng: 67.0750 },
-      { id: "ev1-9", name: "Clock Tower DHA", lat: 24.8050, lng: 67.0550 },
-      { id: "ev1-10", name: "Dolmen Mall Clifton", lat: 24.8140, lng: 67.0330 }
-    ]
-  },
-  {
-    id: "pbs-ev3",
-    name: "EV-3 (Malir Cantt Check Post 5 to Numaish)",
-    service: "Peoples Bus (EV)",
-    colorHex: "#0284c7",
-    badgeBg: "bg-sky-700",
-    badgeText: "text-white",
-    baseFare: 100,
-    fareRule: "Flat Rs. 100",
-    stops: [
-      { id: "ev3-1", name: "Malir Cantt Check Post 5", lat: 24.9351, lng: 67.1852 },
-      { id: "ev3-2", name: "Safoora Chowrangi", lat: 24.9312, lng: 67.1524 },
-      { id: "ev3-3", name: "Mausamiyat", lat: 24.9335, lng: 67.1265 },
-      { id: "ev3-4", name: "University of Karachi (Silver Jubilee)", lat: 24.9348, lng: 67.1118 },
-      { id: "ev3-5", name: "NIPA Chowrangi", lat: 24.9192, lng: 67.0984 },
-      { id: "ev3-6", name: "Johar Mor", lat: 24.9150, lng: 67.1100 },
-      { id: "ev3-7", name: "Millennium Mall", lat: 24.9050, lng: 67.1000 },
-      { id: "ev3-8", name: "National Stadium", lat: 24.8950, lng: 67.0850 },
-      { id: "ev3-9", name: "Aga Khan Hospital", lat: 24.8900, lng: 67.0750 },
-      { id: "ev3-10", name: "Jail Chowrangi", lat: 24.8820, lng: 67.0650 },
-      { id: "ev3-11", name: "Numaish Chowrangi (Surface)", lat: 24.8715, lng: 67.0385 }
-    ]
-  }
+export type CityId = "karachi" | "twin_cities";
+
+export interface CityConfig {
+  id: CityId;
+  name: string;
+  urduName: string;
+  center: [number, number];
+}
+
+export const CITIES: CityConfig[] = [
+  { id: "karachi", name: "Karachi", urduName: "کراچی", center: [24.8934, 67.0822] },
+  { id: "twin_cities", name: "Islamabad & Rawalpindi", urduName: "اسلام آباد / راولپنڈی", center: [33.6444, 73.0679] },
 ];
 
-export const INITIAL_REPORTS: DelayReport[] = [
-  {
-    id: "rep-101",
-    routeId: "green-line",
-    routeName: "Green Line BRT",
-    stopName: "Numaish Chowrangi (BRT Station)",
-    issueType: "Overcrowded",
-    comment: "Subway entry queue is high during rush hour. 12-15 min wait time for tokens.",
-    timestamp: "8 mins ago"
-  },
-  {
-    id: "rep-102",
-    routeId: "pbs-r1",
-    routeName: "Route 1 (Model Colony to Dockyard)",
-    stopName: "Karsaz (Shahrah-e-Faisal)",
-    issueType: "Heavy Traffic",
-    comment: "Slow movement from Karsaz to Nursery flyover.",
-    timestamp: "18 mins ago"
-  },
-  {
-    id: "rep-103",
-    routeId: "pbs-ev3",
-    routeName: "EV-3 (Malir Cantt to Numaish)",
-    stopName: "Safoora Chowrangi",
-    issueType: "Delay",
-    comment: "Bus departed 10 minutes behind schedule.",
-    timestamp: "32 mins ago"
-  }
-];
+// --- ROUTE DATABASES BY CITY ---
+
+export const TRANSIT_DATA: Record<CityId, TransitRoute[]> = {
+  karachi: [
+    {
+      id: "green-line",
+      name: "Surjani Town to Numaish",
+      service: "Green Line BRT",
+      colorHex: "#047857",
+      badgeBg: "bg-emerald-700",
+      badgeText: "text-white",
+      baseFare: 55,
+      fareRule: "Rs. 15 to Rs. 55 distance slab",
+      stops: [
+        { id: "gl-1", name: "Surjani Town Terminal", lat: 25.0345, lng: 67.0642 },
+        { id: "gl-2", name: "4K Chowrangi", lat: 25.0116, lng: 67.0682 },
+        { id: "gl-3", name: "Do Minute Chowrangi", lat: 24.9965, lng: 67.0664 },
+        { id: "gl-4", name: "Power House Chowrangi", lat: 24.9818, lng: 67.0651 },
+        { id: "gl-5", name: "UP More", lat: 24.9750, lng: 67.0659 },
+        { id: "gl-6", name: "Nagan Chowrangi", lat: 24.9682, lng: 67.0667 },
+        { id: "gl-7", name: "Sakhi Hassan", lat: 24.9546, lng: 67.0632 },
+        { id: "gl-8", name: "Hyderi", lat: 24.9388, lng: 67.0435 },
+        { id: "gl-9", name: "Board Office", lat: 24.9298, lng: 67.0345 },
+        { id: "gl-10", name: "Nazimabad No. 1", lat: 24.9182, lng: 67.0312 },
+        { id: "gl-11", name: "Lasbela Chowk", lat: 24.8872, lng: 67.0295 },
+        { id: "gl-12", name: "Patel Para (Guru Mandir)", lat: 24.8775, lng: 67.0335 },
+        { id: "gl-13", name: "Numaish Chowrangi", lat: 24.8719, lng: 67.0381 }
+      ]
+    },
+    {
+      id: "pbs-r1",
+      name: "Route 1 (Model Colony to Dockyard)",
+      service: "Peoples Bus (Red)",
+      colorHex: "#dc2626",
+      badgeBg: "bg-red-600",
+      badgeText: "text-white",
+      baseFare: 80,
+      fareRule: "Rs. 80 (<=15km), Rs. 120 (>15km)",
+      stops: [
+        { id: "r1-1", name: "Model Colony", lat: 24.8978, lng: 67.1895 },
+        { id: "r1-2", name: "Malir Halt", lat: 24.8894, lng: 67.1702 },
+        { id: "r1-3", name: "Colony Gate", lat: 24.8860, lng: 67.1620 },
+        { id: "r1-4", name: "Jinnah Airport Terminal 1", lat: 24.8821, lng: 67.1425 },
+        { id: "r1-5", name: "Drigh Road Station", lat: 24.8789, lng: 67.1192 },
+        { id: "r1-6", name: "PAF Base Faisal", lat: 24.8750, lng: 67.1050 },
+        { id: "r1-7", name: "Karsaz (Shahrah-e-Faisal)", lat: 24.8721, lng: 67.0876 },
+        { id: "r1-8", name: "Nursery", lat: 24.8680, lng: 67.0750 },
+        { id: "r1-9", name: "FTC (Baloch Colony)", lat: 24.8624, lng: 67.0612 },
+        { id: "r1-10", name: "Metropole Hotel", lat: 24.8528, lng: 67.0298 },
+        { id: "r1-11", name: "Arts Council", lat: 24.8542, lng: 67.0195 },
+        { id: "r1-12", name: "Merewether Tower", lat: 24.8485, lng: 66.9998 },
+        { id: "r1-13", name: "Dockyard", lat: 24.8420, lng: 66.9850 }
+      ]
+    },
+    {
+      id: "pbs-r2",
+      name: "Route 2 (North Karachi to Indus Hospital)",
+      service: "Peoples Bus (Red)",
+      colorHex: "#dc2626",
+      badgeBg: "bg-red-600",
+      badgeText: "text-white",
+      baseFare: 80,
+      fareRule: "Rs. 80 (<=15km), Rs. 120 (>15km)",
+      stops: [
+        { id: "r2-1", name: "North Karachi Sector 5", lat: 25.0020, lng: 67.0710 },
+        { id: "r2-2", name: "Nagan Chowrangi", lat: 24.9682, lng: 67.0667 },
+        { id: "r2-3", name: "Sohrab Goth", lat: 24.9450, lng: 67.0870 },
+        { id: "r2-4", name: "NIPA Chowrangi", lat: 24.9192, lng: 67.0984 },
+        { id: "r2-5", name: "Johar Mor", lat: 24.9150, lng: 67.1100 },
+        { id: "r2-6", name: "Drigh Road Station", lat: 24.8789, lng: 67.1192 },
+        { id: "r2-7", name: "Shah Faisal Colony", lat: 24.8700, lng: 67.1400 },
+        { id: "r2-8", name: "Singer Chowrangi", lat: 24.8450, lng: 67.1350 },
+        { id: "r2-9", name: "Indus Hospital Korangi", lat: 24.8250, lng: 67.1210 }
+      ]
+    },
+    {
+      id: "pbs-ev3",
+      name: "EV-3 (Malir Cantt to Numaish)",
+      service: "Peoples Bus (EV)",
+      colorHex: "#0284c7",
+      badgeBg: "bg-sky-700",
+      badgeText: "text-white",
+      baseFare: 100,
+      fareRule: "Flat Rs. 100",
+      stops: [
+        { id: "ev3-1", name: "Malir Cantt Check Post 5", lat: 24.9351, lng: 67.1852 },
+        { id: "ev3-2", name: "Safoora Chowrangi", lat: 24.9312, lng: 67.1524 },
+        { id: "ev3-3", name: "Mausamiyat", lat: 24.9335, lng: 67.1265 },
+        { id: "ev3-4", name: "University of Karachi (Silver Jubilee)", lat: 24.9348, lng: 67.1118 },
+        { id: "ev3-5", name: "NIPA Chowrangi", lat: 24.9192, lng: 67.0984 },
+        { id: "ev3-6", name: "Johar Mor", lat: 24.9150, lng: 67.1100 },
+        { id: "ev3-7", name: "Millennium Mall", lat: 24.9050, lng: 67.1000 },
+        { id: "ev3-8", name: "National Stadium", lat: 24.8950, lng: 67.0850 },
+        { id: "ev3-9", name: "Aga Khan Hospital", lat: 24.8900, lng: 67.0750 },
+        { id: "ev3-10", name: "Jail Chowrangi", lat: 24.8820, lng: 67.0650 },
+        { id: "ev3-11", name: "Numaish Chowrangi", lat: 24.8715, lng: 67.0385 }
+      ]
+    }
+  ],
+  twin_cities: [
+    {
+      id: "isb-red",
+      name: "Rawalpindi - Islamabad Metrobus",
+      service: "Red Line BRT",
+      colorHex: "#dc2626",
+      badgeBg: "bg-red-600",
+      badgeText: "text-white",
+      baseFare: 30,
+      fareRule: "Flat Rs. 30",
+      stops: [
+        { id: "ir-1", name: "Saddar", lat: 33.5939, lng: 73.0538 },
+        { id: "ir-2", name: "Liaquat Bagh", lat: 33.6050, lng: 73.0640 },
+        { id: "ir-3", name: "Committee Chowk", lat: 33.6120, lng: 73.0670 },
+        { id: "ir-4", name: "Chandni Chowk", lat: 33.6300, lng: 73.0730 },
+        { id: "ir-5", name: "Sixth Road", lat: 33.6420, lng: 73.0780 },
+        { id: "ir-6", name: "Faizabad", lat: 33.6610, lng: 73.0800 },
+        { id: "ir-7", name: "IJP", lat: 33.6650, lng: 73.0700 },
+        { id: "ir-8", name: "Faiz Ahmed Faiz", lat: 33.6750, lng: 73.0550 },
+        { id: "ir-9", name: "Peshawar Morr (Kashmir Highway)", lat: 33.6900, lng: 73.0450 },
+        { id: "ir-10", name: "PIMS", lat: 33.7050, lng: 73.0500 },
+        { id: "ir-11", name: "7th Avenue", lat: 33.7120, lng: 73.0650 },
+        { id: "ir-12", name: "Parade Ground", lat: 33.7190, lng: 73.0850 },
+        { id: "ir-13", name: "Pak Secretariat", lat: 33.7310, lng: 73.0950 }
+      ]
+    },
+    {
+      id: "isb-orange",
+      name: "Airport Route",
+      service: "Orange Line",
+      colorHex: "#ea580c",
+      badgeBg: "bg-orange-600",
+      badgeText: "text-white",
+      baseFare: 50,
+      fareRule: "Flat Rs. 50",
+      stops: [
+        { id: "io-1", name: "Peshawar Morr (Kashmir Highway)", lat: 33.6900, lng: 73.0450 },
+        { id: "io-2", name: "G-10 Station", lat: 33.6700, lng: 73.0150 },
+        { id: "io-3", name: "NUST", lat: 33.6450, lng: 72.9900 },
+        { id: "io-4", name: "G-13", lat: 33.6350, lng: 72.9750 },
+        { id: "io-5", name: "N-5 Interchange", lat: 33.6150, lng: 72.9250 },
+        { id: "io-6", name: "Islamabad International Airport", lat: 33.5550, lng: 72.8250 }
+      ]
+    }
+  ]
+};
+
+export const INITIAL_REPORTS: DelayReport[] = [];
 
 export function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
@@ -209,9 +220,11 @@ export interface RouteLeg {
   fare?: number;
 }
 
+// Updated engine to accept specific city routes dynamically
 export function findFastestRoute(
   origin: BusStop,
-  destination: BusStop
+  destination: BusStop,
+  cityRoutes: TransitRoute[]
 ): { legs: RouteLeg[]; totalTime: number; totalFare: number; totalDistance: number } | null {
   const nodes: GraphNode[] = [];
   const adjacencyList = new Map<
@@ -219,7 +232,7 @@ export function findFastestRoute(
     { target: string; time: number; type: "RIDE" | "WALK"; dist: number }[]
   >();
 
-  TRANSIT_ROUTES.forEach((route) => {
+  cityRoutes.forEach((route) => {
     for (let i = 0; i < route.stops.length; i++) {
       const stop = route.stops[i];
       const uniqueId = `${route.id}-${stop.id}`;
@@ -229,7 +242,7 @@ export function findFastestRoute(
       if (i < route.stops.length - 1) {
         const nextStop = route.stops[i + 1];
         const dist = getDistanceKm(stop.lat, stop.lng, nextStop.lat, nextStop.lng);
-        const speed = route.id === "green-line" ? 35 : 22;
+        const speed = route.service.includes("BRT") || route.service.includes("Line") ? 35 : 22;
         const time = (dist / speed) * 60;
         adjacencyList.get(uniqueId)!.push({
           target: `${route.id}-${nextStop.id}`,
@@ -242,7 +255,7 @@ export function findFastestRoute(
       if (i > 0) {
         const prevStop = route.stops[i - 1];
         const dist = getDistanceKm(stop.lat, stop.lng, prevStop.lat, prevStop.lng);
-        const speed = route.id === "green-line" ? 35 : 22;
+        const speed = route.service.includes("BRT") || route.service.includes("Line") ? 35 : 22;
         const time = (dist / speed) * 60;
         adjacencyList.get(uniqueId)!.push({
           target: `${route.id}-${prevStop.id}`,
@@ -277,10 +290,7 @@ export function findFastestRoute(
   }
 
   const distances = new Map<string, number>();
-  const previous = new Map<
-    string,
-    { node: string; type: "RIDE" | "WALK"; dist: number } | null
-  >();
+  const previous = new Map<string, { node: string; type: "RIDE" | "WALK"; dist: number } | null>();
   const unvisited = new Set<string>();
 
   nodes.forEach((n) => {
@@ -344,7 +354,6 @@ export function findFastestRoute(
     current = prev ? prev.node : null;
   }
 
-// Parse path into human-readable legs
   const legs: RouteLeg[] = [];
   let currentLeg: RouteLeg | null = null;
   let totalFare = 0;
@@ -355,13 +364,11 @@ export function findFastestRoute(
     const toNode = nodes.find((n) => n.uniqueId === rawPath[i + 1])!;
     const transition = previous.get(toNode.uniqueId)!;
     
-    // Only add to total distance if it's an actual movement
     if (transition.dist > 0.1) {
        totalDistance += transition.dist;
     }
 
     if (transition.type === "WALK") {
-      // FIX: Ignore phantom walks at the exact same coordinates
       if (transition.dist > 0.05) { 
         if (currentLeg) legs.push(currentLeg);
         legs.push({
@@ -378,24 +385,25 @@ export function findFastestRoute(
         if (currentLeg) legs.push(currentLeg);
 
         let initialFare = fromNode.route.baseFare;
-        if (fromNode.route.id === "green-line") initialFare = 40;
+        if (fromNode.route.id === "green-line") initialFare = 40; // BRT Average
         totalFare += initialFare;
 
+        const speed = fromNode.route.service.includes("BRT") || fromNode.route.service.includes("Line") ? 35 : 22;
         currentLeg = {
           type: "RIDE",
           route: fromNode.route,
           startStop: fromNode.stop,
           endStop: toNode.stop,
           distanceKm: transition.dist,
-          timeMins: (transition.dist / (fromNode.route.id === "green-line" ? 35 : 22)) * 60,
+          timeMins: (transition.dist / speed) * 60,
           stopsPassed: 1,
           fare: initialFare,
         };
       } else {
         currentLeg.endStop = toNode.stop;
         currentLeg.distanceKm += transition.dist;
-        currentLeg.timeMins +=
-          (transition.dist / (fromNode.route.id === "green-line" ? 35 : 22)) * 60;
+        const speed = currentLeg.route?.service.includes("BRT") || currentLeg.route?.service.includes("Line") ? 35 : 22;
+        currentLeg.timeMins += (transition.dist / speed) * 60;
         currentLeg.stopsPassed = (currentLeg.stopsPassed || 1) + 1;
       }
     }

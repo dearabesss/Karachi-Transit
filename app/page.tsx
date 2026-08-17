@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import {
-  TRANSIT_ROUTES,
+  CITIES,
+  CityId,
+  TRANSIT_DATA,
   INITIAL_REPORTS,
   BusStop,
   DelayReport,
@@ -18,6 +20,7 @@ import {
   AlertTriangle,
   Clock,
   Languages,
+  Map as MapIcon
 } from "lucide-react";
 
 const TransitMap = dynamic(() => import("@/components/TransitMap"), {
@@ -29,20 +32,27 @@ const TransitMap = dynamic(() => import("@/components/TransitMap"), {
   ),
 });
 
-export default function KarachiTransitApp() {
+export default function NationalTransitApp() {
   const [isUrdu, setIsUrdu] = useState<boolean>(false);
+  const [selectedCityId, setSelectedCityId] = useState<CityId>("karachi");
   const [activeTab, setActiveTab] = useState<"plan" | "reports">("plan");
+  
   const [selectedOrigin, setSelectedOrigin] = useState<BusStop | null>(null);
   const [selectedDestination, setSelectedDestination] = useState<BusStop | null>(null);
-  const [userCoords, setUserCoords] = useState<[number, number] | null>([24.8719, 67.0381]);
+  const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
   const [reports, setReports] = useState<DelayReport[]>(INITIAL_REPORTS);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+
+  // Active Data for the selected city
+  const activeCityConfig = CITIES.find((c) => c.id === selectedCityId)!;
+  const activeRoutes = TRANSIT_DATA[selectedCityId];
 
   useEffect(() => {
     async function fetchReports() {
       try {
         const res = await fetch("/api/reports");
         const data = await res.json();
+        // In a real database, filter reports by selectedCityId here
         if (data.reports) setReports(data.reports);
       } catch {
         // Fallback
@@ -51,15 +61,23 @@ export default function KarachiTransitApp() {
     fetchReports();
   }, []);
 
+  // When city changes, reset trip data
+  const handleCityChange = (newCityId: CityId) => {
+    setSelectedCityId(newCityId);
+    setSelectedOrigin(null);
+    setSelectedDestination(null);
+    setUserCoords(null);
+  };
+
   const allStops = useMemo(() => {
     const map = new Map<string, BusStop>();
-    TRANSIT_ROUTES.forEach((r) =>
+    activeRoutes.forEach((r) =>
       r.stops.forEach((s) => {
         if (!map.has(s.name)) map.set(s.name, s);
       })
     );
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }, []);
+  }, [activeRoutes]);
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
@@ -71,7 +89,7 @@ export default function KarachiTransitApp() {
 
           let closest: BusStop | null = null;
           let minDistance = Infinity;
-          TRANSIT_ROUTES.forEach((r) => {
+          activeRoutes.forEach((r) => {
             r.stops.forEach((s) => {
               const d = getDistanceKm(lat, lng, s.lat, s.lng);
               if (d < minDistance) {
@@ -91,8 +109,9 @@ export default function KarachiTransitApp() {
     if (!selectedOrigin || !selectedDestination || selectedOrigin.name === selectedDestination.name) {
       return null;
     }
-    return findFastestRoute(selectedOrigin, selectedDestination);
-  }, [selectedOrigin, selectedDestination]);
+    // Pass the activeRoutes (Specific City) to the Dijkstra engine
+    return findFastestRoute(selectedOrigin, selectedDestination, activeRoutes);
+  }, [selectedOrigin, selectedDestination, activeRoutes]);
 
   return (
     <div className="flex flex-col h-screen bg-white md:flex-row font-sans text-slate-900 overflow-hidden">
@@ -103,7 +122,7 @@ export default function KarachiTransitApp() {
         <header className="px-5 py-3 bg-slate-900 text-white flex items-center justify-between shrink-0">
           <div>
             <h1 className="text-base font-bold tracking-tight">
-              {isUrdu ? "کراچی ٹرانزٹ" : "Karachi Transit"}
+              {isUrdu ? "پاک ٹرانزٹ" : "Pak Transit"}
             </h1>
           </div>
           <button
@@ -114,6 +133,22 @@ export default function KarachiTransitApp() {
             {isUrdu ? "English" : "اردو"}
           </button>
         </header>
+
+        {/* CITY SELECTOR */}
+        <div className="bg-slate-800 px-5 py-2.5 border-t border-slate-700 shrink-0 flex items-center gap-3">
+           <MapIcon className="w-4 h-4 text-slate-400" />
+           <select 
+              value={selectedCityId}
+              onChange={(e) => handleCityChange(e.target.value as CityId)}
+              className="bg-slate-800 text-white text-sm font-bold focus:outline-none w-full"
+           >
+              {CITIES.map(city => (
+                 <option key={city.id} value={city.id}>
+                    {isUrdu ? city.urduName : city.name} Network
+                 </option>
+              ))}
+           </select>
+        </div>
 
         <div className="flex border-b border-slate-200 px-5 pt-3 bg-slate-50 shrink-0">
           <button
@@ -159,7 +194,7 @@ export default function KarachiTransitApp() {
                     </button>
                   </div>
                   <select
-                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900 bg-white"
                     value={selectedOrigin?.name || ""}
                     onChange={(e) => setSelectedOrigin(allStops.find((s) => s.name === e.target.value) || null)}
                   >
@@ -173,7 +208,7 @@ export default function KarachiTransitApp() {
                     {isUrdu ? "منزل" : "Destination"}
                   </label>
                   <select
-                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:border-slate-900 bg-white"
                     value={selectedDestination?.name || ""}
                     onChange={(e) => setSelectedDestination(allStops.find((s) => s.name === e.target.value) || null)}
                   >
@@ -255,23 +290,32 @@ export default function KarachiTransitApp() {
                 + {isUrdu ? "نئی رپورٹ شامل کریں" : "Post Update"}
               </button>
 
-              {reports.map((rep) => (
-                <div key={rep.id} className="bg-white border border-slate-200 p-3.5 rounded space-y-2 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-900">{rep.routeName}</span>
-                    <span className="text-[10px] font-medium text-slate-500">{rep.timestamp}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
-                      {rep.issueType}
-                    </span>
-                    <span className="text-slate-600 font-medium text-xs">@ {rep.stopName}</span>
-                  </div>
-                  
-                  <p className="text-xs text-slate-700 pt-1 leading-relaxed">{rep.comment}</p>
+              {reports.length === 0 ? (
+                <div className="bg-slate-50 border border-dashed border-slate-300 p-8 rounded text-center mt-4">
+                  <AlertTriangle className="w-6 h-6 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm font-bold text-slate-600">
+                    {isUrdu ? "کوئی حالیہ الرٹ نہیں" : "No active alerts"}
+                  </p>
                 </div>
-              ))}
+              ) : (
+                reports.map((rep) => (
+                  <div key={rep.id} className="bg-white border border-slate-200 p-3.5 rounded space-y-2 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">{rep.routeName}</span>
+                      <span className="text-[10px] font-medium text-slate-500">{rep.timestamp}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200">
+                        {rep.issueType}
+                      </span>
+                      <span className="text-slate-600 font-medium text-xs">@ {rep.stopName}</span>
+                    </div>
+                    
+                    <p className="text-xs text-slate-700 pt-1 leading-relaxed">{rep.comment}</p>
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
@@ -279,10 +323,11 @@ export default function KarachiTransitApp() {
 
       <main className="flex-1 bg-slate-200 relative z-10 h-[45%] md:h-full border-t md:border-t-0 md:border-l border-slate-300">
         <TransitMap
-          routes={TRANSIT_ROUTES}
+          routes={activeRoutes} // Only pass routes for the selected city
           activeLegs={journeyData ? journeyData.legs : null}
           userCoords={userCoords}
           nearestStop={null} 
+          cityCenter={activeCityConfig.center} // Pass the center so map flies there
           onSelectAsOrigin={(s) => setSelectedOrigin(s)}
           onSelectAsDestination={(s) => setSelectedDestination(s)}
         />
